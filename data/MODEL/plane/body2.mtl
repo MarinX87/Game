@@ -1,0 +1,16 @@
+newmtl body:prednji_deoSG
+illum 4
+Kd 1.00 0.35 0.35
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 4.31
+newmtl body2:avionSG
+illum 4
+Kd 0.58 0.47 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+Ni 1.00
+Ks 0.50 0.50 0.50
+Ns 4.31
