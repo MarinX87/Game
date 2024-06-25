@@ -1,6 +1,20 @@
-﻿  enemy.cpp
+﻿  bg.cpp
+  bullet.cpp
+  camera.cpp
+  collision.cpp
+  debugproc.cpp
+  effect.cpp
+  enemy.cpp
+  fade.cpp
   file.cpp
+  input.cpp
   main.cpp
   player.cpp
+  renderer.cpp
+  result.cpp
+  score.cpp
+  sound.cpp
+  sprite.cpp
+  title.cpp
   コードを生成中...
   sample.vcxproj -> C:\Users\ths31031\Documents\GitHub\Game\Game\Game\x64\Debug\sample.exe

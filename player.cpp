@@ -469,8 +469,29 @@ void DrawPlayer(void)
 			{	// 影表示
 				SetBlendState(BLEND_MODE_SUBTRACT);	// 減算合成
 
-				// テクスチャ設定
-				GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+				// mode別のテクスチャ切り替え
+				switch (g_Player[i].mode)
+				{
+				case 0:
+					// テクスチャ設定
+					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+					break;
+
+				case 1:
+					// テクスチャ設定
+					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+					break;
+
+				case 2:
+					// テクスチャ設定
+					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+					break;
+
+				case 3:
+					// テクスチャ設定
+					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+					break;
+				}
 
 				float px = g_Player[i].pos.x - bg->pos.x;	// プレイヤーの表示位置X
 				float py = g_Player[i].pos.y - bg->pos.y;	// プレイヤーの表示位置Y
