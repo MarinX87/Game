@@ -33,7 +33,6 @@
 #define	PLAYER_JUMP_CNT_MAX			(30)		// 30フレームで着地する
 #define	PLAYER_JUMP_Y_MAX			(300.0f)	// ジャンプの高さ
 
-
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
@@ -116,6 +115,9 @@ HRESULT InitPlayer(void)
 		g_Player[i].jumpCnt = 0;
 		g_Player[i].jumpY = 0.0f;
 		g_Player[i].jumpYMax = PLAYER_JUMP_Y_MAX;
+
+		// プレイヤーのモードの初期化
+		g_Player[i].mode = 0;
 
 		// 分身用
 		g_Player[i].dash = FALSE;
@@ -372,7 +374,51 @@ void UpdatePlayer(void)
 					SetBullet(pos);
 				}
 
+				// プレイヤーのモードの切り替え
+				{
+					if (GetKeyboardTrigger(DIK_1))
+					{
+						g_Player[i].mode = 0;
+					}
+
+					if (GetKeyboardTrigger(DIK_2))
+					{
+						g_Player[i].mode = 1;
+					}
+
+					if (GetKeyboardTrigger(DIK_3))
+					{
+						g_Player[i].mode = 2;
+					}
+
+					if (GetKeyboardTrigger(DIK_4))
+					{
+						g_Player[i].mode = 3;
+					}
+				}
+
+				// mode別の処理
+				switch (g_Player[i].mode)
+				{
+				case 0:
+
+					break;
+
+				case 1:
+
+					break;
+
+				case 2:
+
+					break;
+
+				case 3:
+
+					break;
+				}
+
 			}
+
 		}
 	}
 
