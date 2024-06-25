@@ -18,7 +18,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(200/2)	// ƒLƒƒƒ‰ƒTƒCƒY
 #define TEXTURE_HEIGHT				(200/2)	// 
-#define TEXTURE_MAX					(2)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
+#define TEXTURE_MAX					(5)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
 
 #define TEXTURE_PATTERN_DIVIDE_X	(3)		// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iX)
 #define TEXTURE_PATTERN_DIVIDE_Y	(4)		// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iY)
@@ -47,6 +47,9 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 
 static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/char01.png",
+	"data/TEXTURE/char02.png",
+	"data/TEXTURE/char03.png",
+	"data/TEXTURE/char04.png",
 	"data/TEXTURE/shadow000.jpg",
 };
 
@@ -402,6 +405,9 @@ void UpdatePlayer(void)
 						g_Player[i].mode = 3;
 					}
 
+					// ƒeƒNƒXƒ`ƒƒØ‚è‘Ö‚¦
+					g_Player[i].texNo = g_Player[i].mode;
+
 				}
 
 				// mode•Ê‚Ìˆ—
@@ -476,29 +482,8 @@ void DrawPlayer(void)
 			{	// ‰e•\Ž¦
 				SetBlendState(BLEND_MODE_SUBTRACT);	// Œ¸ŽZ‡¬
 
-				// mode•Ê‚ÌƒeƒNƒXƒ`ƒƒØ‚è‘Ö‚¦
-				switch (g_Player[i].mode)
-				{
-				case 0:
-					// ƒeƒNƒXƒ`ƒƒÝ’è
-					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-					break;
-
-				case 1:
-					// ƒeƒNƒXƒ`ƒƒÝ’è
-					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-					break;
-
-				case 2:
-					// ƒeƒNƒXƒ`ƒƒÝ’è
-					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-					break;
-
-				case 3:
-					// ƒeƒNƒXƒ`ƒƒÝ’è
-					GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-					break;
-				}
+				// ƒeƒNƒXƒ`ƒƒÝ’è
+				GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[4]);
 
 				float px = g_Player[i].pos.x - bg->pos.x;	// ƒvƒŒƒCƒ„[‚Ì•\Ž¦ˆÊ’uX
 				float py = g_Player[i].pos.y - bg->pos.y;	// ƒvƒŒƒCƒ„[‚Ì•\Ž¦ˆÊ’uY
