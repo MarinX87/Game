@@ -376,6 +376,12 @@ void UpdatePlayer(void)
 
 				// プレイヤーのモードの切り替え
 				{
+
+					if (IsButtonTriggered(0, BUTTON_Y))
+					{
+						g_Player[i].mode = (g_Player[i].mode + 1) % 4;
+					}
+
 					if (GetKeyboardTrigger(DIK_1))
 					{
 						g_Player[i].mode = 0;
@@ -395,6 +401,7 @@ void UpdatePlayer(void)
 					{
 						g_Player[i].mode = 3;
 					}
+
 				}
 
 				// mode別の処理
