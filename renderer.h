@@ -119,6 +119,3 @@ void DebugTextOut(char* text, int x, int y);
 void SetFuchi(int flag);
 void SetShaderCamera(XMFLOAT3 pos);
 
-void SetClearColor(float* color4);
-
-ID3D11Device* GetD3DDevice(void);

@@ -6,28 +6,29 @@
 //=============================================================================
 #include "main.h"
 #include "renderer.h"
-#include "input.h"
 #include "camera.h"
 #include "debugproc.h"
-#include "model.h"
+#include "input.h"
+
+#include "title.h"
+#include "bg.h"
 #include "player.h"
 #include "enemy.h"
-#include "shadow.h"
-#include "light.h"
-#include "meshfield.h"
-#include "meshwall.h"
-#include "tree.h"
-#include "collision.h"
 #include "bullet.h"
 #include "score.h"
+#include "result.h"
 #include "sound.h"
-#include "particle.h"
+#include "fade.h"
+
+#include "file.h"
+
+#include "effect.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 #define CLASS_NAME		"AppClass"			// ウインドウのクラス名
-#define WINDOW_NAME		"メッシュ表示"		// ウインドウのキャプション名
+#define WINDOW_NAME		"DirectX11"			// ウインドウのキャプション名
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -38,22 +39,23 @@ void Uninit(void);
 void Update(void);
 void Draw(void);
 
-void CheckHit(void);
-
 
 //*****************************************************************************
 // グローバル変数:
 //*****************************************************************************
 long g_MouseX = 0;
 long g_MouseY = 0;
-float g_inter_end;
-BOOL g_Blood = FALSE;
+
 
 #ifdef _DEBUG
 int		g_CountFPS;							// FPSカウンタ
 char	g_DebugStr[2048] = WINDOW_NAME;		// デバッグ文字表示用
 
 #endif
+
+int	g_Mode = MODE_TITLE;					// 起動時の画面を設定
+
+BOOL g_LoadGame = FALSE;					// NewGame
 
 
 //=============================================================================
@@ -86,7 +88,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	};
 	HWND		hWnd;
 	MSG			msg;
-
+	
 	// ウィンドウクラスの登録
 	RegisterClassEx(&wcex);
 
@@ -103,8 +105,26 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		hInstance,
 		NULL);
 
+	// ウィンドウモードかフルスクリーンモードかの処理
+	BOOL mode = TRUE;
+
+	//int id = MessageBox(NULL, "Windowモードでプレイしますか？", "起動モード", MB_YESNOCANCEL | MB_ICONQUESTION);
+	//switch (id)
+	//{
+	//case IDYES:		// YesならWindowモードで起動
+	//	mode = TRUE;
+	//	break;
+	//case IDNO:		// Noならフルスクリーンモードで起動
+	//	mode = FALSE;	// 環境によって動かない事がある
+	//	break;
+	//case IDCANCEL:	// CANCELなら終了
+	//default:
+	//	return -1;
+	//	break;
+	//}
+
 	// 初期化処理(ウィンドウを作成してから行う)
-	if (FAILED(Init(hInstance, hWnd, TRUE)))
+	if(FAILED(Init(hInstance, hWnd, mode)))
 	{
 		return -1;
 	}
@@ -117,13 +137,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// ウインドウの表示(初期化処理の後に呼ばないと駄目)
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
-
+	
 	// メッセージループ
-	while (1)
+	while(1)
 	{
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			if (msg.message == WM_QUIT)
+			if(msg.message == WM_QUIT)
 			{// PostQuitMessage()が呼ばれたらループ終了
 				break;
 			}
@@ -133,7 +153,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-		}
+        }
 		else
 		{
 			dwCurrentTime = timeGetTime();
@@ -185,14 +205,14 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 //=============================================================================
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	switch (message)
+	switch(message)
 	{
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
 
 	case WM_KEYDOWN:
-		switch (wParam)
+		switch(wParam)
 		{
 		case VK_ESCAPE:
 			DestroyWindow(hWnd);
@@ -217,67 +237,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 //=============================================================================
 HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 {
+	// 描画の初期化
 	InitRenderer(hInstance, hWnd, bWindow);
 
-	InitLight();
-
+	// カメラの初期化
 	InitCamera();
 
-	InitSound(hWnd);
-	// 入力処理の初期化
-	InitInput(hInstance, hWnd);
-
-	// フィールドの初期化
-	InitMeshField(XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), 100, 100, 13.0f, 13.0f);
-
-	// 壁の初期化
-	InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, 0.0f, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(XMFLOAT3(MAP_LEFT, 0.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(XMFLOAT3(MAP_RIGHT, 0.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_DOWN), XMFLOAT3(0.0f, XM_PI, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 16, 2, 80.0f, 80.0f);
-
-	// 壁(裏側用の半透明)
-	InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_TOP), XMFLOAT3(0.0f, XM_PI, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(XMFLOAT3(MAP_LEFT, 0.0f, 0.0f), XMFLOAT3(0.0f, XM_PI * 0.50f, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(XMFLOAT3(MAP_RIGHT, 0.0f, 0.0f), XMFLOAT3(0.0f, -XM_PI * 0.50f, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-	InitMeshWall(XMFLOAT3(0.0f, 0.0f, MAP_DOWN), XMFLOAT3(0.0f, 0.0f, 0.0f),
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 0.25f), 16, 2, 80.0f, 80.0f);
-
-	// 影の初期化処理
-	InitShadow();
-
-	// プレイヤーの初期化
-	InitPlayer();
-
-	// エネミーの初期化
-	InitEnemy();
-
-	// 木を生やす
-	InitTree();
-
-	// 弾の初期化
-	InitBullet();
-
-
-	// スコアの初期化
-	InitScore();
-
-	InitParticle();
-
-	PlaySound(SOUND_LABEL_BGM_sample000);
-
 	// ライトを有効化
-	SetLightEnable(TRUE);
+	SetLightEnable(FALSE);
 
 	// 背面ポリゴンをカリング
 	SetCullingMode(CULL_MODE_BACK);
+
+	// 入力処理の初期化
+	InitInput(hInstance, hWnd);
+
+	// サウンド処理の初期化
+	InitSound(hWnd);
+
+	// フェード処理の初期化
+	InitFade();
+
+
+	// 最初のモードをセット
+	SetMode(g_Mode);	// ここはSetModeのままで！
 
 	return S_OK;
 }
@@ -287,38 +270,20 @@ HRESULT Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 //=============================================================================
 void Uninit(void)
 {
-	// スコアの終了処理
-	UninitScore();
+	// 終了のモードをセット
+	SetMode(MODE_MAX);
 
-	// 弾の終了処理
-	UninitBullet();
+	// フェードの終了処理
+	UninitFade();
 
-	// 木の終了処理
-	UninitTree();
+	// サウンドの終了処理
+	UninitSound();
 
-	// エネミーの終了処理
-	UninitEnemy();
-
-	// プレイヤーの終了処理
-	UninitPlayer();
-
-	// 影の終了処理
-	UninitShadow();
-
-	// 壁の終了処理
-	UninitMeshWall();
-
-	// 地面の終了処理
-	UninitMeshField();
+	// 入力の終了処理
+	UninitInput();
 
 	// カメラの終了処理
 	UninitCamera();
-
-	UninitSound();
-
-	UninitParticle();
-	//入力の終了処理
-	UninitInput();
 
 	// レンダラーの終了処理
 	UninitRenderer();
@@ -335,126 +300,74 @@ void Update(void)
 	// カメラ更新
 	UpdateCamera();
 
-	// 地面処理の更新
-	UpdateMeshField();
+	// モードによって処理を分ける
+	switch (g_Mode)
+	{
+	case MODE_TITLE:		// タイトル画面の更新
+		UpdateTitle();
+		break;
 
-	// 壁処理の更新
-	UpdateMeshWall();
+	case MODE_GAME:			// ゲーム画面の更新
+		UpdateBG();
+		UpdatePlayer();
+		UpdateEnemy();
+		UpdateBullet();
+		UpdateEffect();
+		UpdateScore();
+		break;
 
-	// プレイヤーの更新処理
-	UpdatePlayer();
+	case MODE_RESULT:		// リザルト画面の更新
+		UpdateResult();
+		break;
+	}
 
-	// エネミーの更新処理
-	UpdateEnemy();
-
-	// 木の更新処理
-	UpdateTree();
-
-	// 弾の更新処理
-	UpdateBullet();
-
-
-
-	// 影の更新処理
-	UpdateShadow();
-
-
-	// 当たり判定
-	CheckHit();
-
-	UpdateParticle();
-	// スコアの更新処理
-	UpdateScore();
-
+	UpdateFade();			// フェードの更新処理
 }
 
 //=============================================================================
 // 描画処理
 //=============================================================================
-
-// 3D描画物の基本セット
-void Draw0(void)
-{
-	// 地面の描画処理
-	DrawMeshField();
-
-	// 影の描画処理
-	DrawShadow();
-	//for (int i = 0; i < 10; i++)
-	//{
-	//	DrawBloodStain();
-	//}
-	//DrawBloodStain();
-	// プレイヤーの描画処理
-	DrawPlayer();
-
-	//// エネミーの描画処理
-	//DrawEnemy();
-
-	// 弾の描画処理
-	DrawBullet();
-
-	// 壁の描画処理
-	DrawMeshWall();
-
-	// 木の描画処理
-	DrawTree();
-
-	// エネミーの描画処理
-	DrawEnemy();
-
-}
-
-
-// 描画処理
 void Draw(void)
 {
 	// バックバッファクリア
 	Clear();
 
-	{	// 画面描画
-
-		//
-		// 3Dの物を描画する処理
-		//
-
-		SetViewPort(TYPE_FULL_SCREEN);
-
-		// プレイヤー視点
-		PLAYER* player = GetPlayer();
-		XMFLOAT3 pos = player->pos;
-		//static BOOL updown = TRUE;
-		pos.y += 7.0f;			// カメラ酔いを防ぐためにクリアしている
-
-		SetCameraAT(pos);
-		SetCamera();
-		Draw0();				// 3D描画物の基本セット
-		DrawParticle();
-
-	}
+	SetCamera();
 
 	// 2Dの物を描画する処理
-	//
+	SetViewPort(TYPE_FULL_SCREEN);
+
+	// Z比較なし
+	SetDepthEnable(FALSE);
+
+	// ライティングを無効
+	SetLightEnable(FALSE);
+
+
+	// モードによって処理を分ける
+	switch (g_Mode)
 	{
-		SetViewPort(TYPE_FULL_SCREEN);
+	case MODE_TITLE:		// タイトル画面の描画
+		DrawTitle();
+		break;
 
-		// Z比較なし
-		SetDepthEnable(FALSE);
-
-		// ライティングを無効
-		SetLightEnable(FALSE);
-
-
-		// 2Dスコアの描画処理
+	case MODE_GAME:			// ゲーム画面の描画
+		DrawBG();
+		DrawBullet();		// 重なる順番を意識してね
+		DrawEnemy();
+		DrawPlayer();
+		DrawEffect();
 		DrawScore();
+		break;
 
-		// ライティングを有効に
-		SetLightEnable(TRUE);
-
-		// Z比較あり
-		SetDepthEnable(TRUE);
-
+	case MODE_RESULT:		// リザルト画面の描画
+		DrawResult();
+		break;
 	}
+
+
+	DrawFade();				// フェード画面の描画
+
 
 #ifdef _DEBUG
 	// デバッグ表示
@@ -488,120 +401,93 @@ char* GetDebugStr(void)
 
 
 //=============================================================================
-// 当たり判定処理
+// モードの設定
 //=============================================================================
-void CheckHit(void)
+void SetMode(int mode)
 {
-	ENEMY* enemy = GetEnemy();	// エネミーのポインターを初期化
-	PLAYER* player = GetPlayer();	// プレイヤーのポインターを初期化
-	BULLET* bullet = GetBullet();	// 弾のポインターを初期化
-	CAMERA* camera = GetCamera();
+	// モードを変える前に全部メモリを解放しちゃう
+	StopSound();			// まず曲を止める
 
-	// 敵とプレイヤーキャラ
-	for (int i = 0; i < MAX_PLAYER; i++)
+	// モードを変える前に全部メモリを解放しちゃう
+
+	// タイトル画面の終了処理
+	UninitTitle();
+
+	// BGの終了処理
+	UninitBG();
+
+	// プレイヤーの終了処理
+	UninitPlayer();
+
+	// エネミーの終了処理
+	UninitEnemy();
+
+	// バレットの終了処理
+	UninitBullet();
+
+	// スコアの終了処理
+	UninitScore();
+
+	// リザルトの終了処理
+	UninitResult();
+
+	// エフェクトの終了処理
+	UninitEffect();
+
+
+	g_Mode = mode;	// 次のモードをセットしている
+
+	switch (g_Mode)
 	{
-		// プレイヤーが死んでたら次の奴へ
-		if (player[i].use == FALSE) continue;
+	case MODE_TITLE:
+		// タイトル画面の初期化
+		InitTitle();
+		PlaySound(SOUND_LABEL_BGM_maou);
+		break;
 
-		for (int j = 0; j < MAX_ENEMY; j++)
+	case MODE_GAME:
+		// ゲーム画面の初期化
+		InitBG();
+		InitPlayer();
+		InitEnemy();
+		InitBullet();
+		InitEffect();
+		InitScore();
+
+		// ロードゲームだったらすべての初期化が終わった後にセーブデータを読み込む
+		if (g_LoadGame == TRUE)
 		{
-			//敵が死んでたら次の奴へ
-			if (enemy[j].use == FALSE) continue;
-
-			//BCの当たり判定
-			if (CollisionBC(player[i].pos, enemy[j].pos, player[i].size, enemy[j].size))
-			{
-				// 敵キャラクターは倒される
-				SetColorShadow(enemy[j].shadowIdx, XMFLOAT4(1.0f, 0.0f, 0.0f, 0.3f));
-				SetPositionBlood(enemy[j].shadowIdx, enemy[j].pos);
-				//ReleaseShadow(enemy[j].shadowIdx);
-				//SetPositionBlood(enemy[j].shadowIdx, enemy[j].pos);
-				//SetTree()
-				enemy[j].use = FALSE;
-				// スコアを足す
-				AddScore(ADD_SCORE_HITOBJ);
-
-			}
-
-
-		}
-		if (CollisionBC(player[i].pos, camera[0].pos, 70.0f, 50.0f))
-		{
-			//camera->tblMax = 0;
-			player[i].tblMax = 0;
-			g_inter_end = 10000.0f;
-			g_Blood = TRUE;
-		}
-	}
-
-
-	// プレイヤーの弾と敵
-	for (int i = 0; i < MAX_BULLET; i++)
-	{
-		//弾の有効フラグをチェックする
-		if (bullet[i].use == FALSE) continue;
-
-		// 敵と当たってるか調べる
-		for (int j = 0; j < MAX_ENEMY; j++)
-		{
-			//敵の有効フラグをチェックする
-			if (enemy[j].use == FALSE) continue;
-
-			//BCの当たり判定
-			if (CollisionBC(bullet[i].pos, enemy[j].pos, bullet[i].fWidth, enemy[j].size))
-			{
-				// 当たったから未使用に戻す
-				bullet[i].use = FALSE;
-				ReleaseShadow(bullet[i].shadowIdx);
-
-				// 敵キャラクターは倒される
-				enemy[j].use = FALSE;
-				//ReleaseShadow(enemy[j].shadowIdx);
-
-				// スコアを足す
-				AddScore(ADD_SCORE_HITBULLET);
-			}
+			LoadData();
+			g_LoadGame = FALSE;		// ロードしたからフラグをClearする
 		}
 
+		PlaySound(SOUND_LABEL_BGM_sample001);
+		break;
+
+	case MODE_RESULT:
+		InitResult();
+		PlaySound(SOUND_LABEL_BGM_sample002);
+		break;
+
+	case MODE_MAX:
+		break;
 	}
-
-
-	// エネミーが全部死亡したら状態遷移
-	int enemy_count = 0;
-	for (int i = 0; i < MAX_ENEMY; i++)
-	{
-		if (enemy[i].use == FALSE) continue;
-		enemy_count++;
-	}
-
-	// エネミーが０匹？
-	if (enemy_count == 0)
-	{
-		// SetFade(FADE_OUT, MODE_RESULT);
-
-	}
-
 }
 
-XMFLOAT3 VectorMatrixMultiply(const XMFLOAT3& vector, const XMMATRIX& matrix)
+//=============================================================================
+// モードの取得
+//=============================================================================
+int GetMode(void)
 {
-	XMVECTOR xmVector = XMLoadFloat3(&vector);
-
-	XMVECTOR result = XMVector3TransformCoord(xmVector, matrix);
-	XMFLOAT3 finalResult;
-	XMStoreFloat3(&finalResult, result);
-
-	return finalResult;
+	return g_Mode;
 }
 
-XMFLOAT3 NormalizeVector(const XMFLOAT3& vector)
+
+//=============================================================================
+// ニューゲームかロードゲームかをセットする
+//=============================================================================
+void SetLoadGame(BOOL flg)
 {
-	XMVECTOR xmVector = XMLoadFloat3(&vector);
-
-	XMVECTOR normalizedVector = XMVector3Normalize(xmVector);
-
-	XMFLOAT3 normalizedResult;
-	XMStoreFloat3(&normalizedResult, normalizedVector);
-
-	return normalizedResult;
+	g_LoadGame = flg;
 }
+

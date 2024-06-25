@@ -1,35 +1,35 @@
 //=============================================================================
 //
-// 弾発射処理 [bullet.h]
+// バレット処理 [bullet.h]
 // Author : 
 //
 //=============================================================================
 #pragma once
 
+#include "main.h"
+#include "renderer.h"
+#include "sprite.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define	MAX_BULLET		(256)	// 弾最大数
+#define BULLET_MAX		(100)		// バレットのMax数
+#define BULLET_SPEED	(6.0f)		// バレットの移動スピード
 
-//*****************************************************************************
-// 構造体定義
-//*****************************************************************************
-typedef struct
+
+// バレット構造体
+struct BULLET
 {
-	XMFLOAT4X4	mtxWorld;		// ワールドマトリックス
-	XMFLOAT3	pos;			// 位置
-	XMFLOAT3	rot;			// 角度
-	XMFLOAT3	scl;			// スケール
-	MATERIAL	material;		// マテリアル
-	float		spd;			// 移動量
-	float		fWidth;			// 幅
-	float		fHeight;		// 高さ
-	int			shadowIdx;		// 影ID
-	BOOL		use;			// 使用しているかどうか
+	BOOL				use;				// true:使っている  false:未使用
+	float				w, h;				// 幅と高さ
+	XMFLOAT3			pos;				// バレットの座標
+	XMFLOAT3			rot;				// バレットの回転量
+	XMFLOAT3			move;				// バレットの移動量
+	int					countAnim;			// アニメーションカウント
+	int					patternAnim;		// アニメーションパターンナンバー
+	int					texNo;				// 何番目のテクスチャーを使用するのか
 
-
-} BULLET;
+};
 
 
 //*****************************************************************************
@@ -40,7 +40,7 @@ void UninitBullet(void);
 void UpdateBullet(void);
 void DrawBullet(void);
 
-int SetBullet(XMFLOAT3 pos, XMFLOAT3 rot);
-
 BULLET *GetBullet(void);
+void SetBullet(XMFLOAT3 pos);
+
 

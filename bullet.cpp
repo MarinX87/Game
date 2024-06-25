@@ -1,87 +1,95 @@
 //=============================================================================
 //
-// 弾発射処理 [bullet.cpp]
+// バレット処理 [bullet.cpp]
 // Author : 
 //
 //=============================================================================
-#include "main.h"
-#include "renderer.h"
-#include "shadow.h"
 #include "bullet.h"
-
+#include "enemy.h"
+#include "collision.h"
+#include "score.h"
+#include "bg.h"
+#include "effect.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_MAX			(1)				// テクスチャの数
+#define TEXTURE_WIDTH				(100/2)	// キャラサイズ
+#define TEXTURE_HEIGHT				(100/2)	// 
+#define TEXTURE_MAX					(1)		// テクスチャの数
 
-#define	BULLET_WIDTH		(10.0f)			// 頂点サイズ
-#define	BULLET_HEIGHT		(10.0f)			// 頂点サイズ
-
-#define	BULLET_SPEED		(5.0f)			// 弾の移動スピード
-
-
-//*****************************************************************************
-// 構造体定義
-//*****************************************************************************
+#define TEXTURE_PATTERN_DIVIDE_X	(1)		// アニメパターンのテクスチャ内分割数（X)
+#define TEXTURE_PATTERN_DIVIDE_Y	(1)		// アニメパターンのテクスチャ内分割数（Y)
+#define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
+#define ANIM_WAIT					(4)		// アニメーションの切り替わるWait値
 
 
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-HRESULT MakeVertexBullet(void);
+
 
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static ID3D11Buffer					*g_VertexBuffer = NULL;	// 頂点バッファ
-static ID3D11ShaderResourceView		*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
+static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
+static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
-static BULLET						g_Bullet[MAX_BULLET];	// 弾ワーク
-static int							g_TexNo;				// テクスチャ番号
-
-static char *g_TextureName[] =
-{
+static char *g_TexturName[] = {
 	"data/TEXTURE/bullet00.png",
 };
+
+static BOOL		g_Load = FALSE;			// 初期化を行ったかのフラグ
+static BULLET	g_Bullet[BULLET_MAX];	// バレット構造体
+
 
 //=============================================================================
 // 初期化処理
 //=============================================================================
 HRESULT InitBullet(void)
 {
-	MakeVertexBullet();
+	ID3D11Device *pDevice = GetDevice();
 
-	// テクスチャ生成
+	//テクスチャ生成
 	for (int i = 0; i < TEXTURE_MAX; i++)
 	{
+		g_Texture[i] = NULL;
 		D3DX11CreateShaderResourceViewFromFile(GetDevice(),
-			g_TextureName[i],
+			g_TexturName[i],
 			NULL,
 			NULL,
 			&g_Texture[i],
 			NULL);
 	}
 
-	g_TexNo = 0;
 
-	// 弾ワークの初期化
-	for (int nCntBullet = 0; nCntBullet < MAX_BULLET; nCntBullet++)
+	// 頂点バッファ生成
+	D3D11_BUFFER_DESC bd;
+	ZeroMemory(&bd, sizeof(bd));
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.ByteWidth = sizeof(VERTEX_3D) * 4;
+	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
+
+
+	// バレット構造体の初期化
+	for (int i = 0; i < BULLET_MAX; i++)
 	{
-		ZeroMemory(&g_Bullet[nCntBullet].material, sizeof(g_Bullet[nCntBullet].material));
-		g_Bullet[nCntBullet].material.Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
+		g_Bullet[i].use   = FALSE;			// 未使用（発射されていない弾）
+		g_Bullet[i].w     = TEXTURE_WIDTH;
+		g_Bullet[i].h     = TEXTURE_HEIGHT;
+		g_Bullet[i].pos   = XMFLOAT3(300, 300.0f, 0.0f);
+		g_Bullet[i].rot   = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		g_Bullet[i].texNo = 0;
 
-		g_Bullet[nCntBullet].pos = { 0.0f, 0.0f, 0.0f };
-		g_Bullet[nCntBullet].rot = { 0.0f, 0.0f, 0.0f };
-		g_Bullet[nCntBullet].scl = { 1.0f, 1.0f, 1.0f };
-		g_Bullet[nCntBullet].spd = BULLET_SPEED;
-		g_Bullet[nCntBullet].fWidth = BULLET_WIDTH;
-		g_Bullet[nCntBullet].fHeight = BULLET_HEIGHT;
-		g_Bullet[nCntBullet].use = FALSE;
+		g_Bullet[i].countAnim = 0;
+		g_Bullet[i].patternAnim = 0;
 
+		g_Bullet[i].move = XMFLOAT3(0.0f, -BULLET_SPEED, 0.0f);	// 移動量を初期化
 	}
-
-
+	
+	g_Load = TRUE;
 	return S_OK;
 }
 
@@ -90,20 +98,23 @@ HRESULT InitBullet(void)
 //=============================================================================
 void UninitBullet(void)
 {
-	for (int nCntTex = 0; nCntTex < TEXTURE_MAX; nCntTex++)
-	{
-		if (g_Texture[nCntTex] != NULL)
-		{// テクスチャの解放
-			g_Texture[nCntTex]->Release();
-			g_Texture[nCntTex] = NULL;
-		}
-	}
+	if (g_Load == FALSE) return;
 
-	if (g_VertexBuffer != NULL)
-	{// 頂点バッファの解放
+	if (g_VertexBuffer)
+	{
 		g_VertexBuffer->Release();
 		g_VertexBuffer = NULL;
 	}
+
+	for (int i = 0; i < TEXTURE_MAX; i++)
+	{
+		if (g_Texture[i])
+		{
+			g_Texture[i]->Release();
+			g_Texture[i] = NULL;
+		}
+	}
+
 }
 
 //=============================================================================
@@ -111,31 +122,68 @@ void UninitBullet(void)
 //=============================================================================
 void UpdateBullet(void)
 {
+	int bulletCount = 0;				// 処理したバレットの数
 
-	for (int i = 0; i < MAX_BULLET; i++)
+	for (int i = 0; i < BULLET_MAX; i++)
 	{
-		if (g_Bullet[i].use)
-		{
-			// 弾の移動処理
-			g_Bullet[i].pos.x -= sinf(g_Bullet[i].rot.y) * g_Bullet[i].spd;
-			g_Bullet[i].pos.z -= cosf(g_Bullet[i].rot.y) * g_Bullet[i].spd;
-
-			// 影の位置設定
-			SetPositionShadow(g_Bullet[i].shadowIdx, XMFLOAT3(g_Bullet[i].pos.x, 0.1f, g_Bullet[i].pos.z));
-
-
-			// フィールドの外に出たら弾を消す処理
-			if (g_Bullet[i].pos.x < MAP_LEFT
-				|| g_Bullet[i].pos.x > MAP_RIGHT
-				|| g_Bullet[i].pos.z < MAP_DOWN
-				|| g_Bullet[i].pos.z > MAP_TOP)
+		if (g_Bullet[i].use == TRUE)	// このバレットが使われている？
+		{								// Yes
+			// アニメーション  
+			g_Bullet[i].countAnim++;
+			if ((g_Bullet[i].countAnim % ANIM_WAIT) == 0)
 			{
-				g_Bullet[i].use = FALSE;
-				ReleaseShadow(g_Bullet[i].shadowIdx);
+				// パターンの切り替え
+				g_Bullet[i].patternAnim = (g_Bullet[i].patternAnim + 1) % ANIM_PATTERN_NUM;
 			}
 
+			// バレットの移動処理
+			XMVECTOR pos  = XMLoadFloat3(&g_Bullet[i].pos);
+			XMVECTOR move = XMLoadFloat3(&g_Bullet[i].move);
+			pos += move;
+			XMStoreFloat3(&g_Bullet[i].pos, pos);
+
+			// 画面外まで進んだ？
+			BG* bg = GetBG();
+			if (g_Bullet[i].pos.y < (-g_Bullet[i].h/2))		// 自分の大きさを考慮して画面外か判定している
+			{
+				g_Bullet[i].use = false;
+			}
+			if (g_Bullet[i].pos.y > (bg->h + g_Bullet[i].h/2))	// 自分の大きさを考慮して画面外か判定している
+			{
+				g_Bullet[i].use = false;
+			}
+
+			// 当たり判定処理
+			{
+				ENEMY* enemy = GetEnemy();
+
+				// エネミーの数分当たり判定を行う
+				for (int j = 0; j < ENEMY_MAX; j++)
+				{
+					// 生きてるエネミーと当たり判定をする
+					if (enemy[j].use == TRUE)
+					{
+						BOOL ans = CollisionBB(g_Bullet[i].pos, g_Bullet[i].w, g_Bullet[i].h,
+							enemy[j].pos, enemy[j].w, enemy[j].h);
+						// 当たっている？
+						if (ans == TRUE)
+						{
+							// 当たった時の処理
+							enemy[j].use = FALSE;
+							AddScore(100);
+
+							// エフェクト発生
+							SetEffect(enemy[j].pos.x, enemy[j].pos.y, 30);
+						}
+					}
+				}
+			}
+
+
+			bulletCount++;
 		}
 	}
+
 
 }
 
@@ -144,148 +192,81 @@ void UpdateBullet(void)
 //=============================================================================
 void DrawBullet(void)
 {
-	// ライティングを無効
-	SetLightEnable(FALSE);
-
-	XMMATRIX mtxScl, mtxRot, mtxTranslate, mtxWorld;
-
 	// 頂点バッファ設定
 	UINT stride = sizeof(VERTEX_3D);
 	UINT offset = 0;
 	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
 
+	// マトリクス設定
+	SetWorldViewProjection2D();
+
 	// プリミティブトポロジ設定
 	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-	for (int i = 0; i < MAX_BULLET; i++)
+	// マテリアル設定
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	SetMaterial(material);
+
+	BG* bg = GetBG();
+
+	for (int i = 0; i < BULLET_MAX; i++)
 	{
-		if (g_Bullet[i].use)
-		{
-			// ワールドマトリックスの初期化
-			mtxWorld = XMMatrixIdentity();
-
-			// スケールを反映
-			mtxScl = XMMatrixScaling(g_Bullet[i].scl.x, g_Bullet[i].scl.y, g_Bullet[i].scl.z);
-			mtxWorld = XMMatrixMultiply(mtxWorld, mtxScl);
-
-			// 回転を反映
-			mtxRot = XMMatrixRotationRollPitchYaw(g_Bullet[i].rot.x, g_Bullet[i].rot.y + XM_PI, g_Bullet[i].rot.z);
-			mtxWorld = XMMatrixMultiply(mtxWorld, mtxRot);
-
-			// 移動を反映
-			mtxTranslate = XMMatrixTranslation(g_Bullet[i].pos.x, g_Bullet[i].pos.y, g_Bullet[i].pos.z);
-			mtxWorld = XMMatrixMultiply(mtxWorld, mtxTranslate);
-
-			// ワールドマトリックスの設定
-			SetWorldMatrix(&mtxWorld);
-
-			XMStoreFloat4x4(&g_Bullet[i].mtxWorld, mtxWorld);
-
-
-			// マテリアル設定
-			SetMaterial(g_Bullet[i].material);
-
+		if (g_Bullet[i].use == TRUE)		// このバレットが使われている？
+		{									// Yes
 			// テクスチャ設定
-			GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_TexNo]);
+			GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[g_Bullet[i].texNo]);
 
-			// ポリゴンの描画
+			//バレットの位置やテクスチャー座標を反映
+			float px = g_Bullet[i].pos.x - bg->pos.x;	// バレットの表示位置X
+			float py = g_Bullet[i].pos.y - bg->pos.y;	// バレットの表示位置Y
+			float pw = g_Bullet[i].w;		// バレットの表示幅
+			float ph = g_Bullet[i].h;		// バレットの表示高さ
+
+			float tw = 1.0f / TEXTURE_PATTERN_DIVIDE_X;	// テクスチャの幅
+			float th = 1.0f / TEXTURE_PATTERN_DIVIDE_Y;	// テクスチャの高さ
+			float tx = (float)(g_Bullet[i].patternAnim % TEXTURE_PATTERN_DIVIDE_X) * tw;	// テクスチャの左上X座標
+			float ty = (float)(g_Bullet[i].patternAnim / TEXTURE_PATTERN_DIVIDE_X) * th;	// テクスチャの左上Y座標
+
+			// １枚のポリゴンの頂点とテクスチャ座標を設定
+			SetSpriteColorRotation(g_VertexBuffer, 
+				px, py, pw, ph, 
+				tx, ty, tw, th,
+				XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+				g_Bullet[i].rot.z);
+
+			// ポリゴン描画
 			GetDeviceContext()->Draw(4, 0);
 		}
 	}
 
-	// ライティングを有効に
-	SetLightEnable(TRUE);
-
 }
 
-//=============================================================================
-// 頂点情報の作成
-//=============================================================================
-HRESULT MakeVertexBullet(void)
-{
-	// 頂点バッファ生成
-	D3D11_BUFFER_DESC bd;
-	ZeroMemory(&bd, sizeof(bd));
-	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.ByteWidth = sizeof(VERTEX_3D) * 4;
-	bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
-
-	// 頂点バッファに値をセットする
-	D3D11_MAPPED_SUBRESOURCE msr;
-	GetDeviceContext()->Map(g_VertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &msr);
-
-	VERTEX_3D* vertex = (VERTEX_3D*)msr.pData;
-
-	float fWidth = BULLET_WIDTH;
-	float fHeight = BULLET_HEIGHT;
-
-	// 頂点座標の設定
-	vertex[0].Position = { -fWidth / 2.0f, 0.0f,  fHeight / 2.0f };
-	vertex[1].Position = {  fWidth / 2.0f, 0.0f,  fHeight / 2.0f };
-	vertex[2].Position = { -fWidth / 2.0f, 0.0f, -fHeight / 2.0f };
-	vertex[3].Position = {  fWidth / 2.0f, 0.0f, -fHeight / 2.0f };
-
-	// 法線の設定
-	vertex[0].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	vertex[1].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	vertex[2].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-	vertex[3].Normal = XMFLOAT3(0.0f, 1.0f, 0.0f);
-
-	// 拡散光の設定
-	vertex[0].Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-	vertex[1].Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-	vertex[2].Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-	vertex[3].Diffuse = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-	// テクスチャ座標の設定
-	vertex[0].TexCoord = { 0.0f, 0.0f };
-	vertex[1].TexCoord = { 1.0f, 0.0f };
-	vertex[2].TexCoord = { 0.0f, 1.0f };
-	vertex[3].TexCoord = { 1.0f, 1.0f };
-
-	GetDeviceContext()->Unmap(g_VertexBuffer, 0);
-
-	return S_OK;
-}
 
 //=============================================================================
-// 弾のパラメータをセット
-//=============================================================================
-int SetBullet(XMFLOAT3 pos, XMFLOAT3 rot)
-{
-	int nIdxBullet = -1;
-
-	for (int nCntBullet = 0; nCntBullet < MAX_BULLET; nCntBullet++)
-	{
-		if (!g_Bullet[nCntBullet].use)
-		{
-			g_Bullet[nCntBullet].pos = pos;
-			g_Bullet[nCntBullet].rot = rot;
-			g_Bullet[nCntBullet].scl = { 1.0f, 1.0f, 1.0f };
-			g_Bullet[nCntBullet].use = TRUE;
-
-			// 影の設定
-			g_Bullet[nCntBullet].shadowIdx = CreateShadow(g_Bullet[nCntBullet].pos, 0.5f, 0.5f);
-
-			nIdxBullet = nCntBullet;
-
-		//	PlaySound(SOUND_LABEL_SE_shot000);
-
-			break;
-		}
-	}
-
-	return nIdxBullet;
-}
-
-//=============================================================================
-// 弾の取得
+// バレット構造体の先頭アドレスを取得
 //=============================================================================
 BULLET *GetBullet(void)
 {
-	return &(g_Bullet[0]);
+	return &g_Bullet[0];
+}
+
+
+//=============================================================================
+// バレットの発射設定
+//=============================================================================
+void SetBullet(XMFLOAT3 pos)
+{
+	// もし未使用の弾が無かったら発射しない( =これ以上撃てないって事 )
+	for (int i = 0; i < BULLET_MAX; i++)
+	{
+		if (g_Bullet[i].use == FALSE)		// 未使用状態のバレットを見つける
+		{
+			g_Bullet[i].use = TRUE;			// 使用状態へ変更する
+			g_Bullet[i].pos = pos;			// 座標をセット
+			return;							// 1発セットしたので終了する
+		}
+	}
 }
 

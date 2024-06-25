@@ -28,9 +28,6 @@ struct CAMERA
 	
 	float				len;			// カメラの視点と注視点の距離
 
-	float				time;				// 線形補間用
-	int					tblNo;				// 行動データのテーブル番号
-	int					tblMax;				// そのテーブルのデータ数
 };
 
 
@@ -40,13 +37,6 @@ enum {
 	TYPE_RIGHT_HALF_SCREEN,
 	TYPE_UP_HALF_SCREEN,
 	TYPE_DOWN_HALF_SCREEN,
-	TYPE_LT_SCREEN,
-	TYPE_RT_SCREEN,
-	TYPE_LB_SCREEN,
-	TYPE_RB_SCREEN,
-
-	TYPE_BACK_MIRROR,
-
 	TYPE_NONE,
 
 };

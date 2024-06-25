@@ -13,8 +13,7 @@
 #define SCORE_MAX			(99999)		// スコアの最大値
 #define SCORE_DIGIT			(5)			// 桁数
 
-#define	ADD_SCORE_HITOBJ	(10)
-#define	ADD_SCORE_HITBULLET	(100)
+
 
 
 //*****************************************************************************
@@ -25,8 +24,8 @@ void UninitScore(void);
 void UpdateScore(void);
 void DrawScore(void);
 
-void Draw2D(XMFLOAT2,int);
 void AddScore(int add);
 int GetScore(void);
+void SetScore(int score);
 
 

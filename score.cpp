@@ -14,7 +14,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(16)	// ƒLƒƒƒ‰ƒTƒCƒY
 #define TEXTURE_HEIGHT				(32)	// 
-#define TEXTURE_MAX					(3)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
+#define TEXTURE_MAX					(1)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
 
 
 //*****************************************************************************
@@ -30,12 +30,10 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 
 static char *g_TexturName[] = {
 	"data/TEXTURE/number16x32.png",
-	"data/TEXTURE/blood.png",
-	"data/TEXTURE/ud.png",
 };
 
 
-static BOOL						g_Use;						// TRUE:Žg‚Á‚Ä‚¢‚é  FALSE:–¢Žg—p
+static bool						g_Use;						// true:Žg‚Á‚Ä‚¢‚é  false:–¢Žg—p
 static float					g_w, g_h;					// •‚Æ‚‚³
 static XMFLOAT3					g_Pos;						// ƒ|ƒŠƒSƒ“‚ÌÀ•W
 static int						g_TexNo;					// ƒeƒNƒXƒ`ƒƒ”Ô†
@@ -73,10 +71,10 @@ HRESULT InitScore(void)
 
 
 	// ƒvƒŒƒCƒ„[‚Ì‰Šú‰»
-	g_Use   = TRUE;
+	g_Use   = true;
 	g_w     = TEXTURE_WIDTH;
 	g_h     = TEXTURE_HEIGHT;
-	g_Pos   = { SCREEN_CENTER_X, 20.0f, 0.0f };
+	g_Pos   = { 500.0f, 20.0f, 0.0f };
 	g_TexNo = 0;
 
 	g_Score = 0;	// ƒXƒRƒA‚Ì‰Šú‰»
@@ -176,35 +174,6 @@ void DrawScore(void)
 	}
 }
 
-void Draw2D(XMFLOAT2 pos,int index)
-{
-	// ’¸“_ƒoƒbƒtƒ@Ý’è
-	UINT stride = sizeof(VERTEX_3D);
-	UINT offset = 0;
-	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
-
-	// ƒ}ƒgƒŠƒNƒXÝ’è
-	SetWorldViewProjection2D();
-
-	// ƒvƒŠƒ~ƒeƒBƒuƒgƒ|ƒƒWÝ’è
-	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
-	// ƒ}ƒeƒŠƒAƒ‹Ý’è
-	MATERIAL material;
-	ZeroMemory(&material, sizeof(material));
-	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	SetMaterial(material);
-
-	// ƒeƒNƒXƒ`ƒƒÝ’è
-	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[index]);
-
-	// ‚P–‡‚Ìƒ|ƒŠƒSƒ“‚Ì’¸“_‚ÆƒeƒNƒXƒ`ƒƒÀ•W‚ðÝ’è
-	SetSpriteColor(g_VertexBuffer, pos.x, pos.y, 500.f, 500.f, 0.0f, 0.0f, 1.0f, 1.0f,
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-
-	// ƒ|ƒŠƒSƒ“•`‰æ
-	GetDeviceContext()->Draw(4, 0);
-}
 
 //=============================================================================
 // ƒXƒRƒA‚ð‰ÁŽZ‚·‚é
@@ -225,4 +194,11 @@ int GetScore(void)
 {
 	return g_Score;
 }
+
+
+void SetScore(int score)
+{
+	g_Score = score;
+}
+
 

@@ -32,18 +32,20 @@ DWORD g_aSizeAudio[SOUND_LABEL_MAX] = {};					// オーディオデータサイズ
 // 各音素材のパラメータ
 SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 {
-	{ (char*)"data/BGM/VGMA/VGMA Challenge - July 1st.wav", -1 },	// BGM0 Title用
-	{ (char*)"data/BGM/VGMA/VGMA Challenge - July 12th.wav", -1 },	// BGM1
+	{ (char*)"data/BGM/sample000.wav", -1 },	// BGM0
+	{ (char*)"data/BGM/bgm_maoudamashii_neorock73.wav", -1 },	// BGM1
 	{ (char*)"data/BGM/sample001.wav", -1 },	// BGM2
-	{ (char*)"data/BGM/Abstraction - Patreon Goal Reward Loops/Patreon Goal Reward Loops - Track 02.wav", -1 },			// BGM result
-	{ (char*)"data/SE/WAV/Retro9.wav", 0 },		// MENU操作音１
-	{ (char*)"data/SE/WAV/Retro10.wav", 0 },	// MENU確認音１
-	{ (char*)"data/SE/start-level.wav", 0 },	// SE restart
-	{ (char*)"data/SE/WAV/African1.wav", 0 },	// SE rim scan
-	{ (char*)"data/SE/MI_SFX 46.wav", 0 },		// SE Deny
-	{ (char*)"data/SE/WAV/Retro6.wav", 0 },		// SE_move_confirm
-	{ (char*)"data/SE/WAV/Wood Block2.wav", 0 },// SE_move_select
-	{ (char*)"data/SE/WAV/Minimalist13.wav", 0 },// SE_cancel
+	{ (char*)"data/SE/bomb000.wav", 0 },		// 弾発射音
+	{ (char*)"data/SE/defend000.wav", 0 },		// 弾発射音
+	{ (char*)"data/SE/defend001.wav", 0 },		// 弾発射音
+	{ (char*)"data/SE/hit000.wav", 0 },			// 弾発射音
+	{ (char*)"data/SE/laser000.wav", 0 },		// 弾発射音
+	{ (char*)"data/SE/lockon000.wav", 0 },		// 弾発射音
+	{ (char*)"data/SE/shot000.wav", 0 },		// 弾発射音
+	{ (char*)"data/SE/shot001.wav", 0 },		// ヒット音
+
+	{ (char*)"data/BGM/maou.wav", -1 },			// BGM Maou
+
 };
 
 //=============================================================================

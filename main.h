@@ -47,8 +47,8 @@ using namespace DirectX;
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define SCREEN_WIDTH	(1920)			// ウインドウの幅
-#define SCREEN_HEIGHT	(1080)			// ウインドウの高さ
+#define SCREEN_WIDTH	(960)			// ウインドウの幅
+#define SCREEN_HEIGHT	(540)			// ウインドウの高さ
 #define SCREEN_CENTER_X	(SCREEN_WIDTH / 2)	// ウインドウの中心Ｘ座標
 #define SCREEN_CENTER_Y	(SCREEN_HEIGHT / 2)	// ウインドウの中心Ｙ座標
 
@@ -85,5 +85,8 @@ long GetMousePosX(void);
 long GetMousePosY(void);
 char* GetDebugStr(void);
 
-XMFLOAT3 VectorMatrixMultiply(const XMFLOAT3& vector, const XMMATRIX& matrix);
-XMFLOAT3 NormalizeVector(const XMFLOAT3& vector);
+void SetMode(int mode);
+int GetMode(void);
+
+void SetLoadGame(BOOL flg);
+

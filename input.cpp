@@ -4,8 +4,9 @@
 // Author : 
 //
 //=============================================================================
-#include "main.h"
 #include "input.h"
+#include "debugproc.h"
+
 
 //*****************************************************************************
 // マクロ定義
@@ -223,33 +224,33 @@ HRESULT UpdateKeyboard(void)
 //=============================================================================
 // キーボードのプレス状態を取得
 //=============================================================================
-BOOL GetKeyboardPress(int key)
+bool GetKeyboardPress(int key)
 {
-	return (g_keyState[key] & 0x80) ? TRUE : FALSE;
+	return (g_keyState[key] & 0x80) ? true : false;
 }
 
 //=============================================================================
 // キーボードのトリガー状態を取得
 //=============================================================================
-BOOL GetKeyboardTrigger(int key)
+bool GetKeyboardTrigger(int key)
 {
-	return (g_keyStateTrigger[key] & 0x80) ? TRUE : FALSE;
+	return (g_keyStateTrigger[key] & 0x80) ? true : false;
 }
 
 //=============================================================================
 // キーボードのリピート状態を取得
 //=============================================================================
-BOOL GetKeyboardRepeat(int key)
+bool GetKeyboardRepeat(int key)
 {
-	return (g_keyStateRepeat[key] & 0x80) ? TRUE : FALSE;
+	return (g_keyStateRepeat[key] & 0x80) ? true : false;
 }
 
 //=============================================================================
 // キーボードのリリ－ス状態を取得
 //=============================================================================
-BOOL GetKeyboardRelease(int key)
+bool GetKeyboardRelease(int key)
 {
-	return (g_keyStateRelease[key] & 0x80) ? TRUE : FALSE;
+	return (g_keyStateRelease[key] & 0x80) ? true : false;
 }
 
 
@@ -370,11 +371,14 @@ BOOL IsMouseCenterTriggered(void)
 //------------------
 long GetMouseX(void)
 {
-	return mouseState.lX;
+	//return mouseState.lX;
+	return GetMousePosX();
 }
 long GetMouseY(void)
 {
-	return mouseState.lY;
+	//return mouseState.lY;
+	return GetMousePosY();
+
 }
 long GetMouseZ(void)
 {
@@ -405,12 +409,12 @@ HRESULT InitializePad(void)			// パッド初期化
 		// ジョイスティック用のデータ・フォーマットを設定
 		result = pGamePad[i]->SetDataFormat(&c_dfDIJoystick);
 		if ( FAILED(result) )
-			return FALSE; // データフォーマットの設定に失敗
+			return false; // データフォーマットの設定に失敗
 
 		// モードを設定（フォアグラウンド＆非排他モード）
 //		result = pGamePad[i]->SetCooperativeLevel(hWindow, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
 //		if ( FAILED(result) )
-//			return FALSE; // モードの設定に失敗
+//			return false; // モードの設定に失敗
 
 		// 軸の値の範囲を設定
 		// X軸、Y軸のそれぞれについて、オブジェクトが報告可能な値の範囲をセットする。
@@ -449,7 +453,7 @@ HRESULT InitializePad(void)			// パッド初期化
 		pGamePad[i]->Acquire();
 	}
 		
-	return TRUE;
+	return true;
 
 }
 //------------------------------------------- 終了処理
@@ -466,6 +470,8 @@ void UninitPad(void)
 }
 
 //------------------------------------------ 更新
+float GY, GX;
+
 void UpdatePad(void)
 {
 	HRESULT			result;
@@ -501,26 +507,26 @@ void UpdatePad(void)
 		if ( dijs.lX < 0 )					padState[i] |= BUTTON_LEFT;
 		//* x-axis (right)
 		if ( dijs.lX > 0 )					padState[i] |= BUTTON_RIGHT;
-		//* Ａボタン
-		if ( dijs.rgbButtons[0] & 0x80 )	padState[i] |= BUTTON_A;
-		//* Ｂボタン
-		if ( dijs.rgbButtons[1] & 0x80 )	padState[i] |= BUTTON_B;
-		//* Ｃボタン
-		if ( dijs.rgbButtons[2] & 0x80 )	padState[i] |= BUTTON_C;
 		//* Ｘボタン
-		if ( dijs.rgbButtons[3] & 0x80 )	padState[i] |= BUTTON_X;
+		if (dijs.rgbButtons[rgbButtons_X] & 0x80)	padState[i] |= BUTTON_X;
+		//* Ａボタン
+		if ( dijs.rgbButtons[rgbButtons_A] & 0x80 )	padState[i] |= BUTTON_A;
+		//* Ｂボタン
+		if ( dijs.rgbButtons[rgbButtons_B] & 0x80 )	padState[i] |= BUTTON_B;
 		//* Ｙボタン
-		if ( dijs.rgbButtons[4] & 0x80 )	padState[i] |= BUTTON_Y;
-		//* Ｚボタン
-		if ( dijs.rgbButtons[5] & 0x80 )	padState[i] |= BUTTON_Z;
+		if (dijs.rgbButtons[rgbButtons_Y] & 0x80)	padState[i] |= BUTTON_Y;
 		//* Ｌボタン
-		if ( dijs.rgbButtons[6] & 0x80 )	padState[i] |= BUTTON_L;
+		if ( dijs.rgbButtons[rgbButtons_L] & 0x80 )	padState[i] |= BUTTON_L;
 		//* Ｒボタン
-		if ( dijs.rgbButtons[7] & 0x80 )	padState[i] |= BUTTON_R;
+		if ( dijs.rgbButtons[rgbButtons_R] & 0x80 )	padState[i] |= BUTTON_R;
+		//* Ｌ2ボタン
+		if (dijs.rgbButtons[rgbButtons_L2] & 0x80)	padState[i] |= BUTTON_L2;
+		//* Ｒ2ボタン
+		if (dijs.rgbButtons[rgbButtons_R2] & 0x80)	padState[i] |= BUTTON_R2;
+		//* Selectボタン
+		if (dijs.rgbButtons[rgbButtons_SELECT] & 0x80)	padState[i] |= BUTTON_SELECT;
 		//* ＳＴＡＲＴボタン
-		if ( dijs.rgbButtons[8] & 0x80 )	padState[i] |= BUTTON_START;
-		//* Ｍボタン
-		if ( dijs.rgbButtons[9] & 0x80 )	padState[i] |= BUTTON_M;
+		if ( dijs.rgbButtons[rgbButtons_START] & 0x80 )	padState[i] |= BUTTON_START;
 
 		// Trigger設定
 		padTrigger[i] = ((lastPadState ^ padState[i])	// 前回と違っていて
@@ -539,6 +545,5 @@ BOOL IsButtonTriggered(int padNo,DWORD button)
 {
 	return (button & padTrigger[padNo]);
 }
-
 
 

@@ -1,51 +1,60 @@
 //=============================================================================
 //
-// モデル処理 [player.h]
+// プレイヤー処理 [player.h]
 // Author : 
 //
 //=============================================================================
 #pragma once
 
+#include "main.h"
+#include "renderer.h"
+#include "debugproc.h"
+#include "sprite.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define MAX_PLAYER		(1)					// プレイヤーの数
+#define PLAYER_MAX			(1)		// プレイヤーのMax人数
 
-#define	PLAYER_SIZE		(5.0f)				// 当たり判定の大きさ
+#define	PLAYER_OFFSET_CNT	(16)	// 16分身
 
+enum
+{
+	CHAR_DIR_UP,
+	CHAR_DIR_RIGHT,
+	CHAR_DIR_DOWN,
+	CHAR_DIR_LEFT,
+
+	CHAR_DIR_MAX
+};
 
 //*****************************************************************************
 // 構造体定義
 //*****************************************************************************
+
 struct PLAYER
 {
-	XMFLOAT3		pos;		// ポリゴンの位置
-	XMFLOAT3		rot;		// ポリゴンの向き(回転)
-	XMFLOAT3		scl;		// ポリゴンの大きさ(スケール)
+	XMFLOAT3	pos;			// ポリゴンの座標
+	XMFLOAT3	rot;			// ポリゴンの回転量
+	BOOL		use;			// true:使っている  false:未使用
+	float		w, h;			// 幅と高さ
+	float		countAnim;		// アニメーションカウント
+	int			patternAnim;	// アニメーションパターンナンバー
+	int			texNo;			// テクスチャ番号
+	
+	int			dir;			// 向き（0:上 1:右 2:下 3:左）
+	BOOL		moving;			// 移動中フラグ
 
-	XMFLOAT3		facV;		// 向きベクトル
+	BOOL		dash;			// ダッシュ中フラグ
+	XMFLOAT3	move;			// 移動速度
+	XMFLOAT3	offset[PLAYER_OFFSET_CNT];		// 残像ポリゴンの座標
 
-	XMFLOAT4X4		mtxWorld;	// ワールドマトリックス
-
-	BOOL			load;
-	DX11_MODEL		model;		// モデル情報
-
-	float			spd;		// 移動スピード
-	float			dir;		// 向き
-	float			size;		// 当たり判定の大きさ
-	int				shadowIdx;	// 影のIndex
-	BOOL			use;
-
-	// 階層アニメーション用のメンバー変数
-	float			time;		// 線形補間用
-	int				tblNo;		// 行動データのテーブル番号
-	int				tblMax;		// そのテーブルのデータ数
-	BOOL			Iuse;		// 線形補間使用中？
-	// 親は、NULL、子供は親のアドレスを入れる(セーブ＆ロードの時は↓ここ気をつける事)
-	PLAYER			*parent;	// 自分が親ならNULL、自分が子供なら親のplayerアドレス
-
+	BOOL		jump;			// ジャンプフラグ
+	float		jumpY;			// ジャンプの高さ
+	int			jumpCnt;		// ジャンプ中のカウント
+	float		jumpYMax;		// 
 };
+
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -55,7 +64,7 @@ void UninitPlayer(void);
 void UpdatePlayer(void);
 void DrawPlayer(void);
 
-PLAYER *GetPlayer(void);
-void SwitchTable(PLAYER* player, int indexTbl, int size);
+PLAYER* GetPlayer(void);
+
 
 
