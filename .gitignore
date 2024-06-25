@@ -1,2 +1,6 @@
+# Directories
+.vs/
+x64/
 
-*.pdb
+# Object files
+*.cso
