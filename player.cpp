@@ -18,7 +18,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(200/2)	// ƒLƒƒƒ‰ƒTƒCƒY
 #define TEXTURE_HEIGHT				(200/2)	// 
-#define TEXTURE_MAX					(2)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
+#define TEXTURE_MAX					(5)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
 
 #define TEXTURE_PATTERN_DIVIDE_X	(3)		// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iX)
 #define TEXTURE_PATTERN_DIVIDE_Y	(4)		// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iY)
@@ -32,7 +32,6 @@
 // ƒWƒƒƒ“ƒvˆ—
 #define	PLAYER_JUMP_CNT_MAX			(30)		// 30ƒtƒŒ[ƒ€‚Å’…’n‚·‚é
 #define	PLAYER_JUMP_Y_MAX			(300.0f)	// ƒWƒƒƒ“ƒv‚Ì‚‚³
-
 
 //*****************************************************************************
 // ƒvƒƒgƒ^ƒCƒvéŒ¾
@@ -48,6 +47,9 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 
 static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/char01.png",
+	"data/TEXTURE/char02.png",
+	"data/TEXTURE/char03.png",
+	"data/TEXTURE/char04.png",
 	"data/TEXTURE/shadow000.jpg",
 };
 
@@ -116,6 +118,9 @@ HRESULT InitPlayer(void)
 		g_Player[i].jumpCnt = 0;
 		g_Player[i].jumpY = 0.0f;
 		g_Player[i].jumpYMax = PLAYER_JUMP_Y_MAX;
+
+		// ƒvƒŒƒCƒ„[‚Ìƒ‚[ƒh‚Ì‰Šú‰»
+		g_Player[i].mode = 0;
 
 		// •ªg—p
 		g_Player[i].dash = FALSE;
@@ -372,7 +377,61 @@ void UpdatePlayer(void)
 					SetBullet(pos);
 				}
 
+				// ƒvƒŒƒCƒ„[‚Ìƒ‚[ƒh‚ÌØ‚è‘Ö‚¦
+				{
+
+					if (IsButtonTriggered(0, BUTTON_Y))
+					{
+						g_Player[i].mode = (g_Player[i].mode + 1) % 4;
+					}
+
+					if (GetKeyboardTrigger(DIK_1))
+					{
+						g_Player[i].mode = 0;
+					}
+
+					if (GetKeyboardTrigger(DIK_2))
+					{
+						g_Player[i].mode = 1;
+					}
+
+					if (GetKeyboardTrigger(DIK_3))
+					{
+						g_Player[i].mode = 2;
+					}
+
+					if (GetKeyboardTrigger(DIK_4))
+					{
+						g_Player[i].mode = 3;
+					}
+
+					// ƒeƒNƒXƒ`ƒƒØ‚è‘Ö‚¦
+					g_Player[i].texNo = g_Player[i].mode;
+
+				}
+
+				// mode•Ê‚Ìˆ—
+				switch (g_Player[i].mode)
+				{
+				case 0:
+
+					break;
+
+				case 1:
+
+					break;
+
+				case 2:
+
+					break;
+
+				case 3:
+
+					break;
+				}
+
 			}
+
 		}
 	}
 
@@ -424,7 +483,7 @@ void DrawPlayer(void)
 				SetBlendState(BLEND_MODE_SUBTRACT);	// Œ¸ŽZ‡¬
 
 				// ƒeƒNƒXƒ`ƒƒÝ’è
-				GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+				GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[4]);
 
 				float px = g_Player[i].pos.x - bg->pos.x;	// ƒvƒŒƒCƒ„[‚Ì•\Ž¦ˆÊ’uX
 				float py = g_Player[i].pos.y - bg->pos.y;	// ƒvƒŒƒCƒ„[‚Ì•\Ž¦ˆÊ’uY

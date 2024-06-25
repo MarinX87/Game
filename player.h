@@ -20,10 +20,10 @@
 
 enum
 {
-	CHAR_DIR_UP,
-	CHAR_DIR_RIGHT,
 	CHAR_DIR_DOWN,
 	CHAR_DIR_LEFT,
+	CHAR_DIR_RIGHT,
+	CHAR_DIR_UP,
 
 	CHAR_DIR_MAX
 };
@@ -53,6 +53,9 @@ struct PLAYER
 	float		jumpY;			// ジャンプの高さ
 	int			jumpCnt;		// ジャンプ中のカウント
 	float		jumpYMax;		// 
+
+	int			mode;			// プレイヤーのモード
+
 };
 
 

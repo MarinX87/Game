@@ -15,7 +15,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(200/2)	// キャラサイズ
 #define TEXTURE_HEIGHT				(200/2)	// 
-#define TEXTURE_MAX					(2)		// テクスチャの数
+#define TEXTURE_MAX					(3)		// テクスチャの数
 
 #define TEXTURE_PATTERN_DIVIDE_X	(1)		// アニメパターンのテクスチャ内分割数（X)
 #define TEXTURE_PATTERN_DIVIDE_Y	(1)		// アニメパターンのテクスチャ内分割数（Y)
