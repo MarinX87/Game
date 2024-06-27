@@ -9,8 +9,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_WIDTH				(8000)			// (SCREEN_WIDTH)	// 背景サイズ
-#define TEXTURE_HEIGHT				(1080)			// (SCREEN_HEIGHT)	// 
+#define TEXTURE_WIDTH				(10000)			// (SCREEN_WIDTH)	// 背景サイズ
+#define TEXTURE_HEIGHT				(1100)			// (SCREEN_HEIGHT)	// 
 #define TEXTURE_MAX					(3)				// テクスチャの数
 
 #define TEXTURE_WIDTH_LOGO			(480)			// ロゴサイズ
@@ -163,42 +163,42 @@ void DrawBG(void)
 	}
 
 
-	// 空を描画
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+	//// 空を描画
+	//{
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		//float	tx = (g_BG.pos.x - g_BG.old_pos.x) * ((float)SCREEN_WIDTH / TEXTURE_WIDTH);
-		//g_BG.scrl += tx * 0.001f;
-		g_BG.scrl += 0.001f;
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	//float	tx = (g_BG.pos.x - g_BG.old_pos.x) * ((float)SCREEN_WIDTH / TEXTURE_WIDTH);
+	//	//g_BG.scrl += tx * 0.001f;
+	//	g_BG.scrl += 0.001f;
 
-		SetSpriteLTColor(g_VertexBuffer,
-			0.0f, 0.0f, SCREEN_WIDTH, SKY_H,
-			g_BG.scrl, 0.0f, 1.0f, 1.0f,
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	//	SetSpriteLTColor(g_VertexBuffer,
+	//		0.0f, 0.0f, SCREEN_WIDTH, SKY_H,
+	//		g_BG.scrl, 0.0f, 1.0f, 1.0f,
+	//		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
+	//}
 
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[2]);
+	//{
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[2]);
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		float	tx = (g_BG.pos.x - g_BG.old_pos.x) * ((float)SCREEN_WIDTH / TEXTURE_WIDTH);
-		g_BG.scrl2 += tx * 0.01f;
-		//g_BG.scrl2 += 0.003f;
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	float	tx = (g_BG.pos.x - g_BG.old_pos.x) * ((float)SCREEN_WIDTH / TEXTURE_WIDTH);
+	//	g_BG.scrl2 += tx * 0.01f;
+	//	//g_BG.scrl2 += 0.003f;
 
-		SetSpriteLTColor(g_VertexBuffer,
-			0.0f, SKY_H/2, SCREEN_WIDTH, SKY_H,
-			g_BG.scrl2, 0.0f, 1.0f, 1.0f,
-			XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	//	SetSpriteLTColor(g_VertexBuffer,
+	//		0.0f, SKY_H/2, SCREEN_WIDTH, SKY_H,
+	//		g_BG.scrl2, 0.0f, 1.0f, 1.0f,
+	//		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
+	//}
 
 
 }
