@@ -367,14 +367,13 @@ void UpdatePlayer(void)
 					XMFLOAT3 pos = g_Player[i].pos;
 					pos.y += g_Player[i].jumpY;
 
-
-					SetBullet(pos);
+					SetBullet(pos, g_Player[i].dir);
 				}
 				if (IsButtonTriggered(0, BUTTON_B))
 				{
 					XMFLOAT3 pos = g_Player[i].pos;
 					pos.y += g_Player[i].jumpY;
-					SetBullet(pos);
+					SetBullet(pos, g_Player[i].dir);
 				}
 
 				// プレイヤーのモードの切り替え

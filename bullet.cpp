@@ -5,6 +5,7 @@
 //
 //=============================================================================
 #include "bullet.h"
+#include "player.h"
 #include "enemy.h"
 #include "collision.h"
 #include "score.h"
@@ -86,7 +87,7 @@ HRESULT InitBullet(void)
 		g_Bullet[i].countAnim = 0;
 		g_Bullet[i].patternAnim = 0;
 
-		g_Bullet[i].move = XMFLOAT3(0.0f, -BULLET_SPEED, 0.0f);	// 移動量を初期化
+		g_Bullet[i].move = XMFLOAT3(0.0f, 0.0f, 0.0f);	// 移動量を初期化
 	}
 	
 	g_Load = TRUE;
@@ -256,7 +257,7 @@ BULLET *GetBullet(void)
 //=============================================================================
 // バレットの発射設定
 //=============================================================================
-void SetBullet(XMFLOAT3 pos)
+void SetBullet(XMFLOAT3 pos, int dir)
 {
 	// もし未使用の弾が無かったら発射しない( =これ以上撃てないって事 )
 	for (int i = 0; i < BULLET_MAX; i++)
@@ -265,6 +266,26 @@ void SetBullet(XMFLOAT3 pos)
 		{
 			g_Bullet[i].use = TRUE;			// 使用状態へ変更する
 			g_Bullet[i].pos = pos;			// 座標をセット
+
+			// 移動方向を設定する
+			switch (dir)
+			{
+			case CHAR_DIR_DOWN:
+				g_Bullet[i].move = XMFLOAT3(0.0f, BULLET_SPEED, 0.0f);
+				break;
+			case CHAR_DIR_LEFT:
+				g_Bullet[i].move = XMFLOAT3(-BULLET_SPEED, 0.0f, 0.0f);
+				break;
+			case CHAR_DIR_RIGHT:
+				g_Bullet[i].move = XMFLOAT3(BULLET_SPEED, 0.0f, 0.0f);
+				break;
+			case CHAR_DIR_UP:
+				g_Bullet[i].move = XMFLOAT3(0.0f, -BULLET_SPEED, 0.0f);
+				break;
+			default:
+				break;
+			}
+
 			return;							// 1発セットしたので終了する
 		}
 	}

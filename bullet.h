@@ -14,7 +14,7 @@
 // マクロ定義
 //*****************************************************************************
 #define BULLET_MAX		(100)		// バレットのMax数
-#define BULLET_SPEED	(6.0f)		// バレットの移動スピード
+#define BULLET_SPEED	(12.0f)		// バレットの移動スピード
 
 
 // バレット構造体
@@ -41,6 +41,6 @@ void UpdateBullet(void);
 void DrawBullet(void);
 
 BULLET *GetBullet(void);
-void SetBullet(XMFLOAT3 pos);
+void SetBullet(XMFLOAT3 pos, int dir);
 
 
