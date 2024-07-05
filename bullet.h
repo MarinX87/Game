@@ -25,6 +25,7 @@ struct BULLET
 	XMFLOAT3			pos;				// バレットの座標
 	XMFLOAT3			rot;				// バレットの回転量
 	XMFLOAT3			move;				// バレットの移動量
+	int					type;				// バレットのタイプ
 	int					countAnim;			// アニメーションカウント
 	int					patternAnim;		// アニメーションパターンナンバー
 	int					texNo;				// 何番目のテクスチャーを使用するのか

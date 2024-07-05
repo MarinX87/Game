@@ -24,6 +24,7 @@
 #define ANIM_PATTERN_NUM			(TEXTURE_PATTERN_DIVIDE_X*TEXTURE_PATTERN_DIVIDE_Y)	// アニメーションパターン数
 #define ANIM_WAIT					(4)		// アニメーションの切り替わるWait値
 
+#define BULLET_TYPE_MAX				(4)		// バレットの種類の最大数
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -83,6 +84,8 @@ HRESULT InitBullet(void)
 		g_Bullet[i].pos   = XMFLOAT3(300, 300.0f, 0.0f);
 		g_Bullet[i].rot   = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		g_Bullet[i].texNo = 0;
+
+		g_Bullet[i].type  = 0;
 
 		g_Bullet[i].countAnim = 0;
 		g_Bullet[i].patternAnim = 0;
@@ -152,6 +155,18 @@ void UpdateBullet(void)
 			if (g_Bullet[i].pos.y > (bg->h + g_Bullet[i].h/2))	// 自分の大きさを考慮して画面外か判定している
 			{
 				g_Bullet[i].use = false;
+			}
+
+			switch (g_Bullet[i].type)
+			{
+			case 0:
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
 			}
 
 			// 当たり判定処理
