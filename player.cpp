@@ -12,6 +12,7 @@
 #include "collision.h"
 #include "score.h"
 #include "file.h"
+#include "fade.h"
 
 //*****************************************************************************
 // マクロ定義
@@ -70,6 +71,9 @@ static int		g_jump[PLAYER_JUMP_CNT_MAX] =
 HRESULT InitPlayer(void)
 {
 	ID3D11Device *pDevice = GetDevice();
+
+
+
 
 	//テクスチャ生成
 	for (int i = 0; i < TEXTURE_MAX; i++)
@@ -258,6 +262,11 @@ void UpdatePlayer(void)
 					g_Player[i].pos.x -= speed;
 					g_Player[i].dir = CHAR_DIR_LEFT;
 					g_Player[i].moving = TRUE;
+				}
+
+				if (GetKeyboardTrigger(DIK_RETURN))
+				{// Enter押したら、ステージを切り替える
+					SetFade(FADE_OUT, MODE_RESULT);
 				}
 
 				// 力業ジャンプ処理
