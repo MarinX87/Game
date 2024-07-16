@@ -38,7 +38,7 @@ static char *g_TexturName[] = {
 };
 
 static BOOL g_Load = FALSE;				   // 初期化を行ったかのフラグ
-static TRANS effectWk[EFFECT_NUM_EFFECTS]; // エフェクト構造体
+static TRANS effectWk[EFFECT_NUM]; // エフェクト構造体
 
 //=============================================================================
 // 初期化処理
@@ -69,7 +69,7 @@ HRESULT InitTrans(void)
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
 	// 初期化処理
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < EFFECT_NUM; i++)
 	{
 		effectWk[i].use = false;
 		effectWk[i].elapsed = 0;
@@ -108,7 +108,7 @@ void UninitTrans(void)
 //=============================================================================
 void UpdateTrans(void)
 {
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < EFFECT_NUM; i++)
 	{
 		if (effectWk[i].use)
 		{
@@ -122,22 +122,22 @@ void UpdateTrans(void)
 			if (effectWk[i].isRemoveOnFinish == FALSE)
 			{
 
-				// エフェクト作成レートの増加処理
-				if (effectWk[i].effectCount < EFFECT_NUM_PARTS)
-					effectWk[i].emitCounter++;
+				//// エフェクト作成レートの増加処理
+				//if (effectWk[i].effectCount < EFFECT_NUM_PARTS)
+				//	effectWk[i].emitCounter++;
 
-				// バッファに空きがあり、追加タイミングが来ていれば新たなエフェクトを追加する
-				while ((effectWk[i].effectCount < EFFECT_NUM_PARTS) && (effectWk[i].emitCounter > EMISSION_RATE))
-				{
-					// 全体追加フラグがONであれば空き領域全てに新たなエフェクトを追加する
-					if (EMISSION_FULL)
-						effectWk[i].effectCount = EFFECT_NUM_PARTS;
-					else
-						effectWk[i].effectCount++;
+				//// バッファに空きがあり、追加タイミングが来ていれば新たなエフェクトを追加する
+				//while ((effectWk[i].effectCount < EFFECT_NUM_PARTS) && (effectWk[i].emitCounter > EMISSION_RATE))
+				//{
+				//	// 全体追加フラグがONであれば空き領域全てに新たなエフェクトを追加する
+				//	if (EMISSION_FULL)
+				//		effectWk[i].effectCount = EFFECT_NUM_PARTS;
+				//	else
+				//		effectWk[i].effectCount++;
 
-					// エフェクト作成レートの初期化
-					effectWk[i].emitCounter = 0;
-				}
+				//	// エフェクト作成レートの初期化
+				//	effectWk[i].emitCounter = 0;
+				//}
 
 				effectWk[i].elapsed++;
 
@@ -175,42 +175,42 @@ void DrawTrans(void)
 
 	BG *bg = GetBG();
 
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < EFFECT_NUM; i++)
 	{
 		if (effectWk[i].use == TRUE) // このエフェクトが使われている？
 		{							 // Yes
 			// テクスチャ設定
 			GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[0]);
 
-			for (int n = 0; n < effectWk[i].effectCount; n++)
-			{
-				if (effectWk[i].pParticle[n].isFinish == 0)
-				{
-					// バレットの位置やテクスチャー座標を反映
-					float px = effectWk[i].pParticle[n].pos.x - bg->pos.x; // エフェクトの表示位置X
-					float py = effectWk[i].pParticle[n].pos.y - bg->pos.y; // エフェクトの表示位置Y
-					float pw = EFFECT_TEXTURE_SIZE_X;					   // エフェクトの表示幅
-					float ph = EFFECT_TEXTURE_SIZE_Y;					   // エフェクトの表示高さ
+			//for (int n = 0; n < effectWk[i].effectCount; n++)
+			//{
+			//	if (effectWk[i].pParticle[n].isFinish == 0)
+			//	{
+			//		// バレットの位置やテクスチャー座標を反映
+			//		float px = effectWk[i].pParticle[n].pos.x - bg->pos.x; // エフェクトの表示位置X
+			//		float py = effectWk[i].pParticle[n].pos.y - bg->pos.y; // エフェクトの表示位置Y
+			//		float pw = EFFECT_TEXTURE_SIZE_X;					   // エフェクトの表示幅
+			//		float ph = EFFECT_TEXTURE_SIZE_Y;					   // エフェクトの表示高さ
 
-					px -= EFFECT_TEXTURE_SIZE_X / 4;
-					py -= EFFECT_TEXTURE_SIZE_Y / 4;
+			//		px -= EFFECT_TEXTURE_SIZE_X / 4;
+			//		py -= EFFECT_TEXTURE_SIZE_Y / 4;
 
-					float tw = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_X;												 // テクスチャの幅
-					float th = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_Y;												 // テクスチャの高さ
-					float tx = (float)(effectWk[i].pParticle[n].PatternAnim % EFFECT_TEXTURE_PATTERN_DIVIDE_X) * tw; // テクスチャの左上X座標
-					float ty = (float)(effectWk[i].pParticle[n].PatternAnim / EFFECT_TEXTURE_PATTERN_DIVIDE_X) * th; // テクスチャの左上Y座標
+			//		float tw = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_X;												 // テクスチャの幅
+			//		float th = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_Y;												 // テクスチャの高さ
+			//		float tx = (float)(effectWk[i].pParticle[n].PatternAnim % EFFECT_TEXTURE_PATTERN_DIVIDE_X) * tw; // テクスチャの左上X座標
+			//		float ty = (float)(effectWk[i].pParticle[n].PatternAnim / EFFECT_TEXTURE_PATTERN_DIVIDE_X) * th; // テクスチャの左上Y座標
 
-					// １枚のポリゴンの頂点とテクスチャ座標を設定
-					SetSpriteColorRotation(g_VertexBuffer,
-										   px, py, pw, ph,
-										   tx, ty, tw, th,
-										   XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-										   0.0f);
+			//		// １枚のポリゴンの頂点とテクスチャ座標を設定
+			//		SetSpriteColorRotation(g_VertexBuffer,
+			//							   px, py, pw, ph,
+			//							   tx, ty, tw, th,
+			//							   XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+			//							   0.0f);
 
-					// ポリゴン描画
-					GetDeviceContext()->Draw(4, 0);
-				}
-			}
+			//		// ポリゴン描画
+			//		GetDeviceContext()->Draw(4, 0);
+			//	}
+			//}
 		}
 	}
 }
@@ -223,7 +223,7 @@ void DrawTrans(void)
 void SetTrans(float x, float y, int duration)
 {
 	// もし未使用のエフェクトが無かったら実行しない( =これ以上表示できないって事 )
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < EFFECT_NUM; i++)
 	{
 		if (effectWk[i].use == false) // 未使用状態のエフェクトを見つける
 		{

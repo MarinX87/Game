@@ -13,7 +13,7 @@
 // マクロ定義
 // #define EFFECT_TEXTURE			_T("data/TEXTURE/bomb.png")	// 画像
 
-#define EFFECT_NUM_EFFECTS 1 // エフェクト最大数
+#define EFFECT_NUM 1 // エフェクト最大数
 
 //*****************************************************************************
 // 構造体宣言

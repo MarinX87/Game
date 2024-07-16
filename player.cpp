@@ -13,7 +13,7 @@
 #include "score.h"
 #include "file.h"
 #include "fade.h"
-
+#include "trans.h"
 //*****************************************************************************
 // É}ÉNÉçíËã`
 //*****************************************************************************
@@ -396,6 +396,7 @@ void UpdatePlayer(void)
 					if (GetKeyboardTrigger(DIK_1))
 					{
 						g_Player[i].mode = 0;
+						SetTrans(g_Player[i].pos.x, g_Player[i].pos.y, 30);
 					}
 
 					if (GetKeyboardTrigger(DIK_2))
