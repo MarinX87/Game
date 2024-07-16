@@ -14,7 +14,7 @@
 // #define EFFECT_TEXTURE			_T("data/TEXTURE/bomb.png")	// 画像
 
 #define TRANS_NUM_PARTS 30	 // エフェクト内パーティクル数
-#define TRANS_NUM_EFFECTS 10 // エフェクト最大数
+#define TRANS_NUM_EFFECTS 1 // エフェクト最大数
 
 //*****************************************************************************
 // 構造体宣言
@@ -47,7 +47,7 @@ typedef struct // エフェクト構造体
 	int effectCount;
 	int emitCounter;
 
-	PARTICLE pParticle[TRANS_NUM_PARTS];
+	TRANS_PARTICLE pParticle[TRANS_NUM_PARTS];
 
 } TRANS_EFFECT;
 

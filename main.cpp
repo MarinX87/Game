@@ -351,9 +351,10 @@ void Draw(void)
 		DrawBG();
 		DrawBullet(); // d‚È‚é‡”Ô‚ğˆÓ¯‚µ‚Ä‚Ë
 		DrawEnemy();
+		DrawTrans();
 		DrawPlayer();
 		DrawEffect();
-		DrawTrans();
+		
 		DrawScore();
 		break;
 

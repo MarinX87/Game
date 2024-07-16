@@ -4,18 +4,18 @@
 // Author :
 //
 //=============================================================================
-#include "effect.h"
+#include "trans.h"
 #include "bg.h"
 
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
 
-#define EFFECT_TEXTURE_SIZE_X (100) // テクスチャサイズ
+#define EFFECT_TEXTURE_SIZE_X (150) // テクスチャサイズ
 #define EFFECT_TEXTURE_SIZE_Y (100) // 同上
 
-#define EFFECT_TEXTURE_PATTERN_DIVIDE_X (4)															// アニメパターンのテクスチャ内分割数（X)
-#define EFFECT_TEXTURE_PATTERN_DIVIDE_Y (4)															// アニメパターンのテクスチャ内分割数（Y)
+#define EFFECT_TEXTURE_PATTERN_DIVIDE_X (7)															// アニメパターンのテクスチャ内分割数（X)
+#define EFFECT_TEXTURE_PATTERN_DIVIDE_Y (1)															// アニメパターンのテクスチャ内分割数（Y)
 #define EFFECT_ANIM_PATTERN_NUM (EFFECT_TEXTURE_PATTERN_DIVIDE_X * EFFECT_TEXTURE_PATTERN_DIVIDE_Y) // アニメーションパターン数
 #define EFFECT_TIME_ANIMATION (1)																	// アニメーションの切り替わるカウント
 
@@ -30,7 +30,7 @@
 //*****************************************************************************
 // プロトタイプ宣言
 //*****************************************************************************
-void ResetParticle(int i, int n);
+void Trans_ResetParticle(int i, int n);
 
 //*****************************************************************************
 // グローバル変数
@@ -74,14 +74,14 @@ HRESULT InitTrans(void)
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
 	// 初期化処理
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < TRANS_NUM_EFFECTS; i++)
 	{
 		effectWk[i].use = false;
 		effectWk[i].elapsed = 0;
 
-		for (int n = 0; n < EFFECT_NUM_PARTS; n++)
+		for (int n = 0; n < TRANS_NUM_PARTS; n++)
 		{
-			ResetParticle(i, n);
+			Trans_ResetParticle(i, n);
 		}
 	}
 
@@ -92,7 +92,7 @@ HRESULT InitTrans(void)
 //=============================================================================
 // パーティクルのリセット
 //=============================================================================
-void ResetParticle(int i, int n)
+void Trans_ResetParticle(int i, int n)
 {
 	effectWk[i].pParticle[n].pos = XMFLOAT3(effectWk[i].pos.x + rand() % EMISSION_WIDTH - (EMISSION_WIDTH / 2), effectWk[i].pos.y + rand() % EMISSION_HEIGHT - (EMISSION_HEIGHT / 2), 0.0f); // 座標データを初期化
 	effectWk[i].pParticle[n].move = XMFLOAT3(0.0f, 0.0f, 0.0f);																																 // 移動量
@@ -132,7 +132,7 @@ void UninitTrans(void)
 //=============================================================================
 void UpdateTrans(void)
 {
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < TRANS_NUM_EFFECTS; i++)
 	{
 		if (effectWk[i].use)
 		{
@@ -147,15 +147,15 @@ void UpdateTrans(void)
 			{
 
 				// エフェクト作成レートの増加処理
-				if (effectWk[i].effectCount < EFFECT_NUM_PARTS)
+				if (effectWk[i].effectCount < TRANS_NUM_PARTS)
 					effectWk[i].emitCounter++;
 
 				// バッファに空きがあり、追加タイミングが来ていれば新たなエフェクトを追加する
-				while ((effectWk[i].effectCount < EFFECT_NUM_PARTS) && (effectWk[i].emitCounter > EMISSION_RATE))
+				while ((effectWk[i].effectCount < TRANS_NUM_PARTS) && (effectWk[i].emitCounter > EMISSION_RATE))
 				{
 					// 全体追加フラグがONであれば空き領域全てに新たなエフェクトを追加する
 					if (EMISSION_FULL)
-						effectWk[i].effectCount = EFFECT_NUM_PARTS;
+						effectWk[i].effectCount = TRANS_NUM_PARTS;
 					else
 						effectWk[i].effectCount++;
 
@@ -217,13 +217,13 @@ void UpdateTrans(void)
 					else
 					{
 						// バッファを初期化する
-						ResetParticle(i, effectIndex);
+						Trans_ResetParticle(i, effectIndex);
 
 						// 末尾でなければインデックスを詰める
 						if (effectIndex != (effectWk[i].effectCount - 1))
 						{
 							effectWk[i].pParticle[effectIndex] = effectWk[i].pParticle[effectWk[i].effectCount - 1];
-							ResetParticle(i, (effectWk[i].effectCount - 1));
+							Trans_ResetParticle(i, (effectWk[i].effectCount - 1));
 						}
 						effectWk[i].effectCount--;
 					}
@@ -257,7 +257,7 @@ void DrawTrans(void)
 
 	BG *bg = GetBG();
 
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < TRANS_NUM_EFFECTS; i++)
 	{
 		if (effectWk[i].use == TRUE) // このエフェクトが使われている？
 		{							 // Yes
@@ -305,7 +305,7 @@ void DrawTrans(void)
 void SetTrans(float x, float y, int duration)
 {
 	// もし未使用のエフェクトが無かったら実行しない( =これ以上表示できないって事 )
-	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
+	for (int i = 0; i < TRANS_NUM_EFFECTS; i++)
 	{
 		if (effectWk[i].use == false) // 未使用状態のエフェクトを見つける
 		{
@@ -323,9 +323,9 @@ void SetTrans(float x, float y, int duration)
 			effectWk[i].numFinish = 0;
 
 			// パーティクルの初期化
-			for (int n = 0; n < EFFECT_NUM_PARTS; n++)
+			for (int n = 0; n < TRANS_NUM_PARTS; n++)
 			{
-				ResetParticle(i, n);
+				Trans_ResetParticle(i, n);
 			}
 
 			return; // 1個セットしたので終了する
