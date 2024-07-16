@@ -396,22 +396,25 @@ void UpdatePlayer(void)
 					if (GetKeyboardTrigger(DIK_1))
 					{
 						g_Player[i].mode = 0;
-						SetTrans(g_Player[i].pos.x + 30.0f, g_Player[i].pos.y + 30.0f, 30);
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					if (GetKeyboardTrigger(DIK_2))
 					{
 						g_Player[i].mode = 1;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					if (GetKeyboardTrigger(DIK_3))
 					{
 						g_Player[i].mode = 2;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					if (GetKeyboardTrigger(DIK_4))
 					{
 						g_Player[i].mode = 3;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					// テクスチャ切り替え
