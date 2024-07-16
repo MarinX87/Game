@@ -13,11 +13,24 @@
 // マクロ定義
 // #define EFFECT_TEXTURE			_T("data/TEXTURE/bomb.png")	// 画像
 
-#define EFFECT_NUM 1 // エフェクト最大数
+#define TRANS_NUM_PARTS 30	 // エフェクト内パーティクル数
+#define TRANS_NUM_EFFECTS 10 // エフェクト最大数
 
 //*****************************************************************************
 // 構造体宣言
 //*****************************************************************************
+
+typedef struct // エフェクト構造体
+{
+	XMFLOAT3 pos;	 // ポリゴンの移動量
+	XMFLOAT3 move;	 // 移動量
+	int PatternAnim; // アニメーションパターンナンバー
+	int CountAnim;	 // アニメーションカウント
+
+	int liveTime;
+
+	bool isFinish;
+} TRANS_PARTICLE;
 
 typedef struct // エフェクト構造体
 {
@@ -33,7 +46,10 @@ typedef struct // エフェクト構造体
 
 	int effectCount;
 	int emitCounter;
-} TRANS;
+
+	PARTICLE pParticle[TRANS_NUM_PARTS];
+
+} TRANS_EFFECT;
 
 //*****************************************************************************
 // プロトタイプ宣言

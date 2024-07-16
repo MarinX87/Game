@@ -4,7 +4,7 @@
 // Author :
 //
 //=============================================================================
-#include "trans.h"
+#include "effect.h"
 #include "bg.h"
 
 //*****************************************************************************
@@ -14,8 +14,8 @@
 #define EFFECT_TEXTURE_SIZE_X (100) // テクスチャサイズ
 #define EFFECT_TEXTURE_SIZE_Y (100) // 同上
 
-#define EFFECT_TEXTURE_PATTERN_DIVIDE_X (7)															// アニメパターンのテクスチャ内分割数（X)
-#define EFFECT_TEXTURE_PATTERN_DIVIDE_Y (1)															// アニメパターンのテクスチャ内分割数（Y)
+#define EFFECT_TEXTURE_PATTERN_DIVIDE_X (4)															// アニメパターンのテクスチャ内分割数（X)
+#define EFFECT_TEXTURE_PATTERN_DIVIDE_Y (4)															// アニメパターンのテクスチャ内分割数（Y)
 #define EFFECT_ANIM_PATTERN_NUM (EFFECT_TEXTURE_PATTERN_DIVIDE_X * EFFECT_TEXTURE_PATTERN_DIVIDE_Y) // アニメーションパターン数
 #define EFFECT_TIME_ANIMATION (1)																	// アニメーションの切り替わるカウント
 
@@ -28,6 +28,11 @@
 #define TEXTURE_MAX (1) // テクスチャの数
 
 //*****************************************************************************
+// プロトタイプ宣言
+//*****************************************************************************
+void ResetParticle(int i, int n);
+
+//*****************************************************************************
 // グローバル変数
 //*****************************************************************************
 static ID3D11Buffer *g_VertexBuffer = NULL;						  // 頂点情報
@@ -37,8 +42,8 @@ static char *g_TexturName[] = {
 	"data/TEXTURE/effect01.png",
 };
 
-static BOOL g_Load = FALSE;				   // 初期化を行ったかのフラグ
-static TRANS effectWk[EFFECT_NUM]; // エフェクト構造体
+static BOOL g_Load = FALSE;						 // 初期化を行ったかのフラグ
+static TRANS_EFFECT effectWk[TRANS_NUM_EFFECTS]; // エフェクト構造体
 
 //=============================================================================
 // 初期化処理
@@ -69,14 +74,33 @@ HRESULT InitTrans(void)
 	GetDevice()->CreateBuffer(&bd, NULL, &g_VertexBuffer);
 
 	// 初期化処理
-	for (int i = 0; i < EFFECT_NUM; i++)
+	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
 	{
 		effectWk[i].use = false;
 		effectWk[i].elapsed = 0;
+
+		for (int n = 0; n < EFFECT_NUM_PARTS; n++)
+		{
+			ResetParticle(i, n);
+		}
 	}
 
 	g_Load = TRUE;
 	return S_OK;
+}
+
+//=============================================================================
+// パーティクルのリセット
+//=============================================================================
+void ResetParticle(int i, int n)
+{
+	effectWk[i].pParticle[n].pos = XMFLOAT3(effectWk[i].pos.x + rand() % EMISSION_WIDTH - (EMISSION_WIDTH / 2), effectWk[i].pos.y + rand() % EMISSION_HEIGHT - (EMISSION_HEIGHT / 2), 0.0f); // 座標データを初期化
+	effectWk[i].pParticle[n].move = XMFLOAT3(0.0f, 0.0f, 0.0f);																																 // 移動量
+
+	effectWk[i].pParticle[n].PatternAnim = 0; // アニメパターン番号をランダムで初期化
+	effectWk[i].pParticle[n].CountAnim = 0;	  // アニメカウントを初期化
+	effectWk[i].pParticle[n].liveTime = 2000;
+	effectWk[i].pParticle[n].isFinish = 0;
 }
 
 //=============================================================================
@@ -108,7 +132,7 @@ void UninitTrans(void)
 //=============================================================================
 void UpdateTrans(void)
 {
-	for (int i = 0; i < EFFECT_NUM; i++)
+	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
 	{
 		if (effectWk[i].use)
 		{
@@ -122,22 +146,22 @@ void UpdateTrans(void)
 			if (effectWk[i].isRemoveOnFinish == FALSE)
 			{
 
-				//// エフェクト作成レートの増加処理
-				//if (effectWk[i].effectCount < EFFECT_NUM_PARTS)
-				//	effectWk[i].emitCounter++;
+				// エフェクト作成レートの増加処理
+				if (effectWk[i].effectCount < EFFECT_NUM_PARTS)
+					effectWk[i].emitCounter++;
 
-				//// バッファに空きがあり、追加タイミングが来ていれば新たなエフェクトを追加する
-				//while ((effectWk[i].effectCount < EFFECT_NUM_PARTS) && (effectWk[i].emitCounter > EMISSION_RATE))
-				//{
-				//	// 全体追加フラグがONであれば空き領域全てに新たなエフェクトを追加する
-				//	if (EMISSION_FULL)
-				//		effectWk[i].effectCount = EFFECT_NUM_PARTS;
-				//	else
-				//		effectWk[i].effectCount++;
+				// バッファに空きがあり、追加タイミングが来ていれば新たなエフェクトを追加する
+				while ((effectWk[i].effectCount < EFFECT_NUM_PARTS) && (effectWk[i].emitCounter > EMISSION_RATE))
+				{
+					// 全体追加フラグがONであれば空き領域全てに新たなエフェクトを追加する
+					if (EMISSION_FULL)
+						effectWk[i].effectCount = EFFECT_NUM_PARTS;
+					else
+						effectWk[i].effectCount++;
 
-				//	// エフェクト作成レートの初期化
-				//	effectWk[i].emitCounter = 0;
-				//}
+					// エフェクト作成レートの初期化
+					effectWk[i].emitCounter = 0;
+				}
 
 				effectWk[i].elapsed++;
 
@@ -145,6 +169,64 @@ void UpdateTrans(void)
 				if ((effectWk[i].duration != -1) && (effectWk[i].duration < effectWk[i].elapsed))
 				{
 					effectWk[i].isRemoveOnFinish = TRUE;
+				}
+			}
+
+			int effectIndex = 0;
+
+			// エフェクトの更新処理
+			while (effectIndex < effectWk[i].effectCount)
+			{
+				if (effectWk[i].pParticle[effectIndex].liveTime > 0)
+				{
+					// 生存フレーム減少
+					effectWk[i].pParticle[effectIndex].liveTime--;
+
+					// アニメパターン進行
+					if (++effectWk[i].pParticle[effectIndex].CountAnim > EFFECT_TIME_ANIMATION)
+					{
+						// アニメパターンが最大値に達した場合でも終了
+						if (++effectWk[i].pParticle[effectIndex].PatternAnim >= (EFFECT_ANIM_PATTERN_NUM - 1))
+						{
+							effectWk[i].pParticle[effectIndex].PatternAnim = EFFECT_ANIM_PATTERN_NUM - 1;
+							effectWk[i].pParticle[effectIndex].liveTime = 0;
+						}
+
+						effectWk[i].pParticle[effectIndex].CountAnim = 0;
+					}
+
+					effectIndex++;
+				}
+				else
+				{
+					if (effectWk[i].isRemoveOnFinish)
+					{
+						if (effectWk[i].pParticle[effectIndex].isFinish == 0)
+						{
+							effectWk[i].pParticle[effectIndex].isFinish = 1;
+							effectWk[i].numFinish++;
+						}
+						// 終了処理
+						if (effectWk[i].numFinish == effectWk[i].effectCount)
+						{
+							effectWk[i].isEnding = TRUE;
+							break;
+						}
+						effectIndex++;
+					}
+					else
+					{
+						// バッファを初期化する
+						ResetParticle(i, effectIndex);
+
+						// 末尾でなければインデックスを詰める
+						if (effectIndex != (effectWk[i].effectCount - 1))
+						{
+							effectWk[i].pParticle[effectIndex] = effectWk[i].pParticle[effectWk[i].effectCount - 1];
+							ResetParticle(i, (effectWk[i].effectCount - 1));
+						}
+						effectWk[i].effectCount--;
+					}
 				}
 			}
 		}
@@ -175,42 +257,42 @@ void DrawTrans(void)
 
 	BG *bg = GetBG();
 
-	for (int i = 0; i < EFFECT_NUM; i++)
+	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
 	{
 		if (effectWk[i].use == TRUE) // このエフェクトが使われている？
 		{							 // Yes
 			// テクスチャ設定
 			GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[0]);
 
-			//for (int n = 0; n < effectWk[i].effectCount; n++)
-			//{
-			//	if (effectWk[i].pParticle[n].isFinish == 0)
-			//	{
-			//		// バレットの位置やテクスチャー座標を反映
-			//		float px = effectWk[i].pParticle[n].pos.x - bg->pos.x; // エフェクトの表示位置X
-			//		float py = effectWk[i].pParticle[n].pos.y - bg->pos.y; // エフェクトの表示位置Y
-			//		float pw = EFFECT_TEXTURE_SIZE_X;					   // エフェクトの表示幅
-			//		float ph = EFFECT_TEXTURE_SIZE_Y;					   // エフェクトの表示高さ
+			for (int n = 0; n < effectWk[i].effectCount; n++)
+			{
+				if (effectWk[i].pParticle[n].isFinish == 0)
+				{
+					// バレットの位置やテクスチャー座標を反映
+					float px = effectWk[i].pParticle[n].pos.x - bg->pos.x; // エフェクトの表示位置X
+					float py = effectWk[i].pParticle[n].pos.y - bg->pos.y; // エフェクトの表示位置Y
+					float pw = EFFECT_TEXTURE_SIZE_X;					   // エフェクトの表示幅
+					float ph = EFFECT_TEXTURE_SIZE_Y;					   // エフェクトの表示高さ
 
-			//		px -= EFFECT_TEXTURE_SIZE_X / 4;
-			//		py -= EFFECT_TEXTURE_SIZE_Y / 4;
+					px -= EFFECT_TEXTURE_SIZE_X / 4;
+					py -= EFFECT_TEXTURE_SIZE_Y / 4;
 
-			//		float tw = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_X;												 // テクスチャの幅
-			//		float th = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_Y;												 // テクスチャの高さ
-			//		float tx = (float)(effectWk[i].pParticle[n].PatternAnim % EFFECT_TEXTURE_PATTERN_DIVIDE_X) * tw; // テクスチャの左上X座標
-			//		float ty = (float)(effectWk[i].pParticle[n].PatternAnim / EFFECT_TEXTURE_PATTERN_DIVIDE_X) * th; // テクスチャの左上Y座標
+					float tw = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_X;												 // テクスチャの幅
+					float th = 1.0f / EFFECT_TEXTURE_PATTERN_DIVIDE_Y;												 // テクスチャの高さ
+					float tx = (float)(effectWk[i].pParticle[n].PatternAnim % EFFECT_TEXTURE_PATTERN_DIVIDE_X) * tw; // テクスチャの左上X座標
+					float ty = (float)(effectWk[i].pParticle[n].PatternAnim / EFFECT_TEXTURE_PATTERN_DIVIDE_X) * th; // テクスチャの左上Y座標
 
-			//		// １枚のポリゴンの頂点とテクスチャ座標を設定
-			//		SetSpriteColorRotation(g_VertexBuffer,
-			//							   px, py, pw, ph,
-			//							   tx, ty, tw, th,
-			//							   XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
-			//							   0.0f);
+					// １枚のポリゴンの頂点とテクスチャ座標を設定
+					SetSpriteColorRotation(g_VertexBuffer,
+										   px, py, pw, ph,
+										   tx, ty, tw, th,
+										   XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f),
+										   0.0f);
 
-			//		// ポリゴン描画
-			//		GetDeviceContext()->Draw(4, 0);
-			//	}
-			//}
+					// ポリゴン描画
+					GetDeviceContext()->Draw(4, 0);
+				}
+			}
 		}
 	}
 }
@@ -223,7 +305,7 @@ void DrawTrans(void)
 void SetTrans(float x, float y, int duration)
 {
 	// もし未使用のエフェクトが無かったら実行しない( =これ以上表示できないって事 )
-	for (int i = 0; i < EFFECT_NUM; i++)
+	for (int i = 0; i < EFFECT_NUM_EFFECTS; i++)
 	{
 		if (effectWk[i].use == false) // 未使用状態のエフェクトを見つける
 		{
@@ -239,6 +321,12 @@ void SetTrans(float x, float y, int duration)
 			effectWk[i].elapsed = 0;
 			effectWk[i].emitCounter = EMISSION_RATE;
 			effectWk[i].numFinish = 0;
+
+			// パーティクルの初期化
+			for (int n = 0; n < EFFECT_NUM_PARTS; n++)
+			{
+				ResetParticle(i, n);
+			}
 
 			return; // 1個セットしたので終了する
 		}
