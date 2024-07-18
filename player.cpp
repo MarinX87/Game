@@ -13,7 +13,7 @@
 #include "score.h"
 #include "file.h"
 #include "fade.h"
-
+#include "trans.h"
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
@@ -43,10 +43,10 @@ void DrawPlayerOffset(int no);
 //*****************************************************************************
 // グローバル変数
 //*****************************************************************************
-static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
-static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
+static ID3D11Buffer* g_VertexBuffer = NULL;				// 頂点情報
+static ID3D11ShaderResourceView* g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
-static char *g_TexturName[TEXTURE_MAX] = {
+static char* g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/char01.png",
 	"data/TEXTURE/char02.png",
 	"data/TEXTURE/char03.png",
@@ -70,7 +70,7 @@ static int		g_jump[PLAYER_JUMP_CNT_MAX] =
 //=============================================================================
 HRESULT InitPlayer(void)
 {
-	ID3D11Device *pDevice = GetDevice();
+	ID3D11Device* pDevice = GetDevice();
 
 
 
@@ -396,21 +396,25 @@ void UpdatePlayer(void)
 					if (GetKeyboardTrigger(DIK_1))
 					{
 						g_Player[i].mode = 0;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					if (GetKeyboardTrigger(DIK_2))
 					{
 						g_Player[i].mode = 1;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					if (GetKeyboardTrigger(DIK_3))
 					{
 						g_Player[i].mode = 2;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					if (GetKeyboardTrigger(DIK_4))
 					{
 						g_Player[i].mode = 3;
+						SetTrans(g_Player[i].pos.x + 35.0f, g_Player[i].pos.y + 30.0f, 10);
 					}
 
 					// テクスチャ切り替え
@@ -496,7 +500,7 @@ void DrawPlayer(void)
 				float px = g_Player[i].pos.x - bg->pos.x;	// プレイヤーの表示位置X
 				float py = g_Player[i].pos.y - bg->pos.y;	// プレイヤーの表示位置Y
 				float pw = g_Player[i].w;		// プレイヤーの表示幅
-				float ph = g_Player[i].h/4;		// プレイヤーの表示高さ
+				float ph = g_Player[i].h / 4;		// プレイヤーの表示高さ
 				py += 50.0f;		// 足元に表示
 
 				float tw = 1.0f;	// テクスチャの幅

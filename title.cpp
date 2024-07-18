@@ -13,10 +13,24 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(SCREEN_WIDTH)	// 背景サイズ
 #define TEXTURE_HEIGHT				(SCREEN_HEIGHT)	// 
-#define TEXTURE_MAX					(3)				// テクスチャの数
+#define TEXTURE_MAX					(4)				// テクスチャの数
+#define YUBI_WIDTH 30
+#define YUBI_HEIGHT 30
 
 #define TEXTURE_WIDTH_LOGO			(480)			// ロゴサイズ
 #define TEXTURE_HEIGHT_LOGO			(80)			// 
+
+#define NEW_GAME_X	540
+#define NEW_GAME_Y	320
+
+#define LOAD_GAME_X	565
+#define LOAD_GAME_Y 365
+
+#define TUTORIAL_X 590
+#define TUTORIAL_Y 410
+
+#define OPTION_X 650
+#define OPTION_Y 460
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -33,6 +47,7 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/titleUI.jpg",
 	"data/TEXTURE/title.png",
 	"data/TEXTURE/effect000.jpg",
+	"data/TEXTURE/yubi.jpg",
 };
 
 
@@ -49,6 +64,8 @@ static BOOL						g_Load = FALSE;
 static float	effect_dx;
 static float	effect_dy;
 
+static int g_CursorX;
+static int g_CursorY;
 
 //=============================================================================
 // 初期化処理
@@ -93,6 +110,9 @@ HRESULT InitTitle(void)
 	effect_dx = 100.0f;
 	effect_dy = 100.0f;
 
+	g_CursorX = NEW_GAME_X;
+	g_CursorY = NEW_GAME_Y;
+
 	g_Load = TRUE;
 	return S_OK;
 }
@@ -122,6 +142,8 @@ void UninitTitle(void)
 	g_Load = FALSE;
 }
 
+
+
 //=============================================================================
 // 更新処理
 //=============================================================================
@@ -141,8 +163,47 @@ void UpdateTitle(void)
 	{
 		SetFade(FADE_OUT, MODE_GAME);
 	}
-
-
+	else if (GetKeyboardTrigger(DIK_DOWN))
+	{
+		if (g_CursorY == NEW_GAME_Y)
+		{
+			g_CursorY = LOAD_GAME_Y;
+			g_CursorX = LOAD_GAME_X;
+		}
+		else if (g_CursorY == LOAD_GAME_Y)
+		{
+			g_CursorY = TUTORIAL_Y;
+			g_CursorX = TUTORIAL_X;
+		}
+		else if (g_CursorY == TUTORIAL_Y)
+		{
+			g_CursorY = OPTION_Y;
+			g_CursorX = OPTION_X;
+		}
+	}
+	else if (GetKeyboardTrigger(DIK_UP))
+	{
+		if(g_CursorY == NEW_GAME_X)
+		{
+			g_CursorY = OPTION_Y;
+			g_CursorX = OPTION_X;
+		}
+		else if (g_CursorY == LOAD_GAME_Y)
+		{
+			g_CursorY = NEW_GAME_Y;
+			g_CursorX = NEW_GAME_X;
+		}
+		else if (g_CursorY == TUTORIAL_Y)
+		{
+			g_CursorY = LOAD_GAME_Y;
+			g_CursorX = LOAD_GAME_X;
+		}
+		else if (g_CursorY == OPTION_Y)
+		{
+			g_CursorY = TUTORIAL_Y;
+			g_CursorX = TUTORIAL_X;
+		}
+	}
 
 	// セーブデータをロードする？
 	if (GetKeyboardTrigger(DIK_L))
@@ -215,29 +276,41 @@ void DrawTitle(void)
 		GetDeviceContext()->Draw(4, 0);
 	}
 
-
-	// 加減算のテスト
-	SetBlendState(BLEND_MODE_ADD);		// 加算合成
-//	SetBlendState(BLEND_MODE_SUBTRACT);	// 減算合成
-		
-	// テクスチャ設定
-	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[2]);
-	
-	for (int i = 0; i < 30; i++)
+	// cursor pointer
 	{
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		float dx = effect_dx;
-		float dy = effect_dy;
-		float sx = (float)(rand() % 100);
-		float sy = (float)(rand() % 100);
+		// テクスチャ設定
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[3]);
 
-		SetSpriteColor(g_VertexBuffer, dx + sx, dy + sy, 50, 50, 0.0f, 0.0f, 1.0f, 1.0f,
-			XMFLOAT4(1.0f, 0.3f, 1.0f, 0.5f));
+		// １枚のポリゴンの頂点とテクスチャ座標を設定
+		SetSpriteLeftTop(g_VertexBuffer, g_CursorX, g_CursorY, YUBI_WIDTH, YUBI_HEIGHT, 0.0f, 0.0f, 1.0f, 1.0f);
 
 		// ポリゴン描画
 		GetDeviceContext()->Draw(4, 0);
 	}
-	SetBlendState(BLEND_MODE_ALPHABLEND);	// 半透明処理を元に戻す
+
+
+//	// 加減算のテスト
+//	SetBlendState(BLEND_MODE_ADD);		// 加算合成
+////	SetBlendState(BLEND_MODE_SUBTRACT);	// 減算合成
+//		
+//	// テクスチャ設定
+//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[2]);
+//	
+//	for (int i = 0; i < 30; i++)
+//	{
+//		// １枚のポリゴンの頂点とテクスチャ座標を設定
+//		float dx = effect_dx;
+//		float dy = effect_dy;
+//		float sx = (float)(rand() % 100);
+//		float sy = (float)(rand() % 100);
+//
+//		SetSpriteColor(g_VertexBuffer, dx + sx, dy + sy, 50, 50, 0.0f, 0.0f, 1.0f, 1.0f,
+//			XMFLOAT4(1.0f, 0.3f, 1.0f, 0.5f));
+//
+//		// ポリゴン描画
+//		GetDeviceContext()->Draw(4, 0);
+//	}
+//	SetBlendState(BLEND_MODE_ALPHABLEND);	// 半透明処理を元に戻す
 
 
 }

@@ -174,17 +174,17 @@ void DrawResult(void)
 		GetDeviceContext()->Draw(4, 0);
 	}
 
-	// リザルトのロゴを描画
-	{
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+	//// リザルトのロゴを描画
+	//{
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSprite(g_VertexBuffer, g_Pos.x, g_Pos.y, TEXTURE_WIDTH_LOGO, TEXTURE_HEIGHT_LOGO, 0.0f, 0.0f, 1.0f, 1.0f);
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	SetSprite(g_VertexBuffer, g_Pos.x, g_Pos.y, TEXTURE_WIDTH_LOGO, TEXTURE_HEIGHT_LOGO, 0.0f, 0.0f, 1.0f, 1.0f);
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-	}
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
+	//}
 
 
 	// スコア表示
@@ -200,9 +200,9 @@ void DrawResult(void)
 			float x = (float)(number % 10);
 
 			// スコアの位置やテクスチャー座標を反映
-			float pw = 16*4;			// スコアの表示幅
-			float ph = 32*4;			// スコアの表示高さ
-			float px = 600.0f - i*pw;	// スコアの表示位置X
+			float pw = 16;			// スコアの表示幅
+			float ph = 32;			// スコアの表示高さ
+			float px = 500.0f - i*pw;	// スコアの表示位置X
 			float py = 300.0f;			// スコアの表示位置Y
 
 			float tw = 1.0f / 10;		// テクスチャの幅
