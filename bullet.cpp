@@ -17,7 +17,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(100/2)	// ƒLƒƒƒ‰ƒTƒCƒY
 #define TEXTURE_HEIGHT				(100/2)	// 
-#define TEXTURE_MAX					(1)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
+#define TEXTURE_MAX					(4)		// ƒeƒNƒXƒ`ƒƒ‚Ì”
 
 #define TEXTURE_PATTERN_DIVIDE_X	(1)		// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iX)
 #define TEXTURE_PATTERN_DIVIDE_Y	(1)		// ƒAƒjƒƒpƒ^[ƒ“‚ÌƒeƒNƒXƒ`ƒƒ“à•ªŠ„”iY)
@@ -39,6 +39,9 @@ static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// ƒeƒNƒXƒ`ƒ
 
 static char *g_TexturName[] = {
 	"data/TEXTURE/bullet00.png",
+	"data/TEXTURE/yubi.jpg",
+	"data/TEXTURE/tree000.png",
+	"data/TEXTURE/shadow000.jpg",
 };
 
 static BOOL		g_Load = FALSE;			// ‰Šú‰»‚ğs‚Á‚½‚©‚Ìƒtƒ‰ƒO
@@ -156,6 +159,8 @@ void UpdateBullet(void)
 			{
 				g_Bullet[i].use = false;
 			}
+
+			g_Bullet[i].texNo = g_Bullet[i].type;
 
 			switch (g_Bullet[i].type)
 			{
@@ -279,6 +284,12 @@ void SetBullet(XMFLOAT3 pos, int dir)
 	{
 		if (g_Bullet[i].use == FALSE)		// –¢g—pó‘Ô‚ÌƒoƒŒƒbƒg‚ğŒ©‚Â‚¯‚é
 		{
+
+			// ƒoƒŒƒbƒg‚Ìí—Ş‚ğ•Ï‚¦‚é
+			PLAYER * player = GetPlayer();
+
+			 g_Bullet[i].type = player[0].mode;
+
 			g_Bullet[i].use = TRUE;			// g—pó‘Ô‚Ö•ÏX‚·‚é
 			g_Bullet[i].pos = pos;			// À•W‚ğƒZƒbƒg
 
