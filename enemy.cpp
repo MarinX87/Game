@@ -241,6 +241,12 @@ void UpdateEnemy(void)
 
 			}
 
+			switch (g_Enemy[i].type)
+			{
+			case 0:
+				break;
+			}
+
 			// 移動が終わったらエネミーとの当たり判定
 			{
 				PLAYER* player = GetPlayer();

@@ -162,6 +162,7 @@ void UpdateBullet(void)
 
 			g_Bullet[i].texNo = g_Bullet[i].type;
 
+			// É^ÉCÉvï ÇÃèàóù
 			switch (g_Bullet[i].type)
 			{
 			case 0:
