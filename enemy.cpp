@@ -117,6 +117,7 @@ HRESULT InitEnemy(void)
 		g_Enemy[i].w = TEXTURE_WIDTH;
 		g_Enemy[i].h = TEXTURE_HEIGHT;
 		g_Enemy[i].texNo = 0;
+		g_Enemy[i].type = 0;
 
 		g_Enemy[i].countAnim = 0;
 		g_Enemy[i].patternAnim = 0;

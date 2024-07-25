@@ -29,6 +29,7 @@ struct ENEMY
 	BOOL		use;			// true:使っている  false:未使用
 	float		w, h;			// 幅と高さ
 	float		countAnim;		// アニメーションカウント
+	int			type;			// エネミーの種類
 	int			patternAnim;	// アニメーションパターンナンバー
 	int			texNo;			// テクスチャ番号
 	XMFLOAT3	move;			// 移動速度
