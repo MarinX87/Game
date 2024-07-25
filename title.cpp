@@ -64,8 +64,8 @@ static BOOL						g_Load = FALSE;
 static float	effect_dx;
 static float	effect_dy;
 
-static int g_CursorX;
-static int g_CursorY;
+static float g_CursorX;
+static float g_CursorY;
 
 //=============================================================================
 // ‰Šú‰»ˆ—
