@@ -269,8 +269,8 @@ void DrawTrans(void)
 				if (effectWk[i].pParticle[n].isFinish == 0)
 				{
 					// バレットの位置やテクスチャー座標を反映
-					float px = effectWk[i].pos.x; // エフェクトの表示位置X
-					float py = effectWk[i].pos.y; // エフェクトの表示位置Y
+					float px = effectWk[i].pos.x - bg->pos.x; // エフェクトの表示位置X
+					float py = effectWk[i].pos.y - bg->pos.y; // エフェクトの表示位置Y
 					float pw = EFFECT_TEXTURE_SIZE_X;					   // エフェクトの表示幅
 					float ph = EFFECT_TEXTURE_SIZE_Y;					   // エフェクトの表示高さ
 
