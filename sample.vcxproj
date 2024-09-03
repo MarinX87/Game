@@ -41,7 +41,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
@@ -153,6 +153,7 @@
     <ClInclude Include="sprite.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="trans.h" />
+    <ClInclude Include="tutorial.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bg.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="trans.cpp" />
+    <ClCompile Include="tutorial.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

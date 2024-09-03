@@ -1,10 +1,10 @@
 //=============================================================================
 //
-// タイトル画面処理 [title.cpp]
+// タイトル画面処理 [tutorial.cpp]
 // Author : 
 //
 //=============================================================================
-#include "title.h"
+#include "tutorial.h"
 #include "input.h"
 #include "fade.h"
 
@@ -20,8 +20,8 @@
 #define TEXTURE_WIDTH_LOGO			(480)			// ロゴサイズ
 #define TEXTURE_HEIGHT_LOGO			(80)			// 
 
-#define NEW_GAME_X	540
-#define NEW_GAME_Y	320
+#define NEW_GAME_X	590
+#define NEW_GAME_Y	410
 
 #define LOAD_GAME_X	565
 #define LOAD_GAME_Y 365
@@ -44,7 +44,7 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/titleUI.jpg",
+	"data/TEXTURE/TUTORIAL.jpg",
 	"data/TEXTURE/title.png",
 	"data/TEXTURE/effect000.jpg",
 	"data/TEXTURE/yubi.jpg",
@@ -56,8 +56,8 @@ static float					g_w, g_h;					// 幅と高さ
 static XMFLOAT3					g_Pos;						// ポリゴンの座標
 static int						g_TexNo;					// テクスチャ番号
 
-float	alpha;
-BOOL	flag_alpha;
+float	Alpha;
+BOOL	flag_Alpha;
 
 static BOOL						g_Load = FALSE;
 
@@ -70,7 +70,7 @@ static float g_CursorY;
 //=============================================================================
 // 初期化処理
 //=============================================================================
-HRESULT InitTitle(void)
+HRESULT InitTutorial(void)
 {
 	ID3D11Device *pDevice = GetDevice();
 
@@ -104,8 +104,8 @@ HRESULT InitTitle(void)
 	g_Pos   = XMFLOAT3(g_w/2, g_h/2, 0.0f);
 	g_TexNo = 0;
 
-	alpha = 1.0f;
-	flag_alpha = TRUE;
+	Alpha = 1.0f;
+	flag_Alpha = TRUE;
 
 	effect_dx = 100.0f;
 	effect_dy = 100.0f;
@@ -120,7 +120,7 @@ HRESULT InitTitle(void)
 //=============================================================================
 // 終了処理
 //=============================================================================
-void UninitTitle(void)
+void UninitTutorial(void)
 {
 	if (g_Load == FALSE) return;
 
@@ -147,21 +147,21 @@ void UninitTitle(void)
 //=============================================================================
 // 更新処理
 //=============================================================================
-void UpdateTitle(void)
+void UpdateTutorial(void)
 {
 
 	if (GetKeyboardTrigger(DIK_RETURN))
 	{// Enter押したら、ステージを切り替える
-		SetFade(FADE_OUT, MODE_TUTORIAL);
+		SetFade(FADE_OUT, MODE_GAME);
 	}
 	// ゲームパッドで入力処理
 	else if (IsButtonTriggered(0, BUTTON_START))
 	{
-		SetFade(FADE_OUT, MODE_TUTORIAL);
+		SetFade(FADE_OUT, MODE_GAME);
 	}
 	else if (IsButtonTriggered(0, BUTTON_B))
 	{
-		SetFade(FADE_OUT, MODE_TUTORIAL);
+		SetFade(FADE_OUT, MODE_GAME);
 	}
 	else if (GetKeyboardTrigger(DIK_DOWN))
 	{
@@ -245,7 +245,7 @@ void UpdateTitle(void)
 //=============================================================================
 // 描画処理
 //=============================================================================
-void DrawTitle(void)
+void DrawTutorial(void)
 {
 	// 頂点バッファ設定
 	UINT stride = sizeof(VERTEX_3D);
