@@ -20,8 +20,8 @@
 #define TEXTURE_WIDTH_LOGO			(480)			// ÉçÉSÉTÉCÉY
 #define TEXTURE_HEIGHT_LOGO			(80)			// 
 
-#define NEW_GAME_X	590
-#define NEW_GAME_Y	410
+#define NEW_GAME_X	700
+#define NEW_GAME_Y	420
 
 #define LOAD_GAME_X	565
 #define LOAD_GAME_Y 365
