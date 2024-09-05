@@ -108,6 +108,7 @@ HRESULT InitPlayer(void)
 		g_Player[i].w = TEXTURE_WIDTH;
 		g_Player[i].h = TEXTURE_HEIGHT;
 		g_Player[i].texNo = 0;
+		g_Player[i].hp = PLAYER_HP;
 
 		g_Player[i].countAnim = 0;
 		g_Player[i].patternAnim = 0;

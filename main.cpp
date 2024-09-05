@@ -21,6 +21,7 @@
 #include "sound.h"
 #include "fade.h"
 #include "trans.h"
+#include "hpbar.h"
 
 #include "file.h"
 
@@ -284,6 +285,7 @@ void Uninit(void)
 
 	// レンダラーの終了処理
 	UninitRenderer();
+
 }
 
 //=============================================================================
@@ -365,6 +367,9 @@ void Draw(void)
 		DrawEffect();
 		
 		DrawScore();
+
+		DrawHpbar();
+
 		break;
 
 	case MODE_RESULT: // リザルト画面の描画
@@ -439,6 +444,8 @@ void SetMode(int mode)
 
 	UninitTrans();
 
+	UninitHpbar();
+
 	g_Mode = mode; // 次のモードをセットしている
 
 	switch (g_Mode)
@@ -462,6 +469,8 @@ void SetMode(int mode)
 		InitEffect();
 		InitTrans();
 		InitScore();
+		InitHpbar();
+
 
 		// ロードゲームだったらすべての初期化が終わった後にセーブデータを読み込む
 		if (g_LoadGame == TRUE)

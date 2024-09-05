@@ -110,8 +110,17 @@ HRESULT InitEnemy(void)
 	g_EnemyCnt = 0;
 	for (int i = 0; i < ENEMY_MAX; i++)
 	{
-		g_Enemy[i].use = TRUE;
-		g_Enemy[i].pos = XMFLOAT3(200.0f + i*200.0f, 100.0f, 0.0f);	// 中心点から表示
+		if (i <= 20)
+		{
+			g_Enemy[i].use = TRUE;
+		}
+		else
+		{
+			g_Enemy[i].use = FALSE;
+		}
+
+		g_Enemy[i].pos = XMFLOAT3(-10000 + rand() % 20000, -10000 + rand() % 20000, 0.0f);	// 中心点から表示
+
 		g_Enemy[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		g_Enemy[i].scl = XMFLOAT3(1.0f, 1.0f, 1.0f);
 		g_Enemy[i].w = TEXTURE_WIDTH;
@@ -184,9 +193,27 @@ void UpdateEnemy(void)
 
 	for (int i = 0; i < ENEMY_MAX; i++)
 	{
+
+		PLAYER* player = GetPlayer();
+
+
+		if (g_Enemy[i].use == FALSE)
+		{
+			int ram = 0;
+
+			ram = rand() % 2000;
+
+			if (ram == 1)
+			{
+				g_Enemy[i].use = TRUE;
+			}
+
+		}
+
 		// 生きてるエネミーだけ処理をする
 		if (g_Enemy[i].use == TRUE)
 		{
+
 			// 地形との当たり判定用に座標のバックアップを取っておく
 			XMFLOAT3 pos_old = g_Enemy[i].pos;
 
@@ -197,59 +224,39 @@ void UpdateEnemy(void)
 				g_Enemy[i].countAnim = 0.0f;
 				// パターンの切り替え
 				g_Enemy[i].patternAnim = (g_Enemy[i].patternAnim + 1) % ANIM_PATTERN_NUM;
-			}
-
-			// 移動処理
-			if (g_Enemy[i].tblMax > 0)	// 線形補間を実行する？
-			{	// 線形補間の処理
-				int nowNo = (int)g_Enemy[i].time;			// 整数分であるテーブル番号を取り出している
-				int maxNo = g_Enemy[i].tblMax;				// 登録テーブル数を数えている
-				int nextNo = (nowNo + 1) % maxNo;			// 移動先テーブルの番号を求めている
-				INTERPOLATION_DATA* tbl = g_MoveTblAdr[g_Enemy[i].tblNo];	// 行動テーブルのアドレスを取得
-				
-				XMVECTOR nowPos = XMLoadFloat3(&tbl[nowNo].pos);	// XMVECTORへ変換
-				XMVECTOR nowRot = XMLoadFloat3(&tbl[nowNo].rot);	// XMVECTORへ変換
-				XMVECTOR nowScl = XMLoadFloat3(&tbl[nowNo].scl);	// XMVECTORへ変換
-				
-				XMVECTOR Pos = XMLoadFloat3(&tbl[nextNo].pos) - nowPos;	// XYZ移動量を計算している
-				XMVECTOR Rot = XMLoadFloat3(&tbl[nextNo].rot) - nowRot;	// XYZ回転量を計算している
-				XMVECTOR Scl = XMLoadFloat3(&tbl[nextNo].scl) - nowScl;	// XYZ拡大率を計算している
-				
-				float nowTime = g_Enemy[i].time - nowNo;	// 時間部分である少数を取り出している
-				
-				Pos *= nowTime;								// 現在の移動量を計算している
-				Rot *= nowTime;								// 現在の回転量を計算している
-				Scl *= nowTime;								// 現在の拡大率を計算している
-
-				// 計算して求めた移動量を現在の移動テーブルXYZに足している＝表示座標を求めている
-				XMStoreFloat3(&g_Enemy[i].pos, nowPos + Pos);
-
-				// 計算して求めた回転量を現在の移動テーブルに足している
-				XMStoreFloat3(&g_Enemy[i].rot, nowRot + Rot);
-
-				// 計算して求めた拡大率を現在の移動テーブルに足している
-				XMStoreFloat3(&g_Enemy[i].scl, nowScl + Scl);
-				g_Enemy[i].w = TEXTURE_WIDTH * g_Enemy[i].scl.x;
-				g_Enemy[i].h = TEXTURE_HEIGHT * g_Enemy[i].scl.y;
-
-				// frameを使て時間経過処理をする
-				g_Enemy[i].time += 1.0f / tbl[nowNo].frame;	// 時間を進めている
-				if ((int)g_Enemy[i].time >= maxNo)			// 登録テーブル最後まで移動したか？
-				{
-					g_Enemy[i].time -= maxNo;				// ０番目にリセットしつつも小数部分を引き継いでいる
-				}
-
-			}
-
+			}			
+			
 			switch (g_Enemy[i].type)
 			{
 			case 0:
 				break;
 			}
 
+			// エネミーからプレイヤーへのベクトルを計算
+			XMFLOAT3 direction;
+			direction.x = player[0].pos.x - g_Enemy[i].pos.x;
+			direction.y = player[0].pos.y - g_Enemy[i].pos.y;
+			direction.z = player[0].pos.z - g_Enemy[i].pos.z;
+
+			// ベクトルの長さを計算
+			float length = sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
+
+			// ベクトルを正規化
+			if (length > 0.0f)
+			{
+				direction.x /= length;
+				direction.y /= length;
+				direction.z /= length;
+			}
+
+			// エネミーの移動量に方向ベクトルを掛けて移動
+			g_Enemy[i].pos.x += direction.x * g_Enemy[i].move.x;
+			g_Enemy[i].pos.y += direction.y * g_Enemy[i].move.x;
+			g_Enemy[i].pos.z += direction.z * g_Enemy[i].move.x;
+
+
 			// 移動が終わったらエネミーとの当たり判定
 			{
-				PLAYER* player = GetPlayer();
 
 				// エネミーの数分当たり判定を行う
 				for (int j = 0; j < ENEMY_MAX; j++)
@@ -264,6 +271,7 @@ void UpdateEnemy(void)
 						{
 							// 当たった時の処理
 						//	player[j].use = FALSE;	// デバッグで一時的に無敵にしておくか
+
 						}
 					}
 				}
