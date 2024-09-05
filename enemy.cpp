@@ -119,7 +119,7 @@ HRESULT InitEnemy(void)
 			g_Enemy[i].use = FALSE;
 		}
 
-		g_Enemy[i].pos = XMFLOAT3(-10000 + rand() % 20000, -10000 + rand() % 20000, 0.0f);	// 中心点から表示
+		g_Enemy[i].pos = XMFLOAT3(-5000 + rand() % 10000, -5000 + rand() % 10000, 0.0f);	// 中心点から表示
 
 		g_Enemy[i].rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		g_Enemy[i].scl = XMFLOAT3(1.0f, 1.0f, 1.0f);
@@ -199,6 +199,9 @@ void UpdateEnemy(void)
 
 		if (g_Enemy[i].use == FALSE)
 		{
+
+			g_Enemy[i].pos = XMFLOAT3(-10000 + rand() % 20000, -10000 + rand() % 20000, 0.0f);
+
 			int ram = 0;
 
 			ram = rand() % 2000;
