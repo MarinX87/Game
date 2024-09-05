@@ -18,6 +18,8 @@
 
 #define	PLAYER_OFFSET_CNT	(16)	// 16分身
 
+#define PLAYER_HP (100); 
+
 enum
 {
 	CHAR_DIR_DOWN,
@@ -41,6 +43,7 @@ struct PLAYER
 	float		countAnim;		// アニメーションカウント
 	int			patternAnim;	// アニメーションパターンナンバー
 	int			texNo;			// テクスチャ番号
+	int			hp;				// ヒットポイント
 	
 	int			dir;			// 向き（0:上 1:右 2:下 3:左）
 	BOOL		moving;			// 移動中フラグ
