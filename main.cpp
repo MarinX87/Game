@@ -453,7 +453,7 @@ void SetMode(int mode)
 	case MODE_TITLE:
 		// タイトル画面の初期化
 		InitTitle();
-		PlaySound(SOUND_LABEL_BGM_maou);
+		PlaySound(SOUND_LABEL_BGM_RPG_01);
 		break;
 
 	case MODE_TUTORIAL:
@@ -479,12 +479,12 @@ void SetMode(int mode)
 			g_LoadGame = FALSE; // ロードしたからフラグをClearする
 		}
 
-		PlaySound(SOUND_LABEL_BGM_sample001);
+		PlaySound(SOUND_LABEL_BGM_RPG_03);
 		break;
 
 	case MODE_RESULT:
 		InitResult();
-		PlaySound(SOUND_LABEL_BGM_sample002);
+		PlaySound(SOUND_LABEL_BGM_taitol);
 		break;
 
 	case MODE_MAX:

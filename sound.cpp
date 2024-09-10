@@ -45,7 +45,9 @@ SOUNDPARAM g_aParam[SOUND_LABEL_MAX] =
 	{ (char*)"data/SE/shot001.wav", 0 },		// ƒqƒbƒg‰¹
 
 	{ (char*)"data/BGM/maou.wav", -1 },			// BGM Maou
-
+	{ (char*)"data/BGM/RPG_01.wav", -1 },
+	{ (char*)"data/BGM/RPG_03.wav", -1 },
+	{ (char*)"data/BGM/taitol.wav", -1 },
 };
 
 //=============================================================================
