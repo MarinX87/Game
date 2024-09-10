@@ -148,6 +148,7 @@ void SetSpriteLTColor(ID3D11Buffer* buf,
 }
 
 
+
 void SetSpriteColor(ID3D11Buffer *buf, float X, float Y, float Width, float Height,
 		float U, float V, float UW, float VH,
 		XMFLOAT4 color)

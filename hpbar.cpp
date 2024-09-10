@@ -45,6 +45,7 @@ static int						hpbar;			    	// ヒットポイント
 //=============================================================================
 // 初期化処理
 //=============================================================================
+
 HRESULT InitHpbar(void)
 {
 	ID3D11Device* pDevice = GetDevice();
@@ -76,7 +77,7 @@ HRESULT InitHpbar(void)
 	use = TRUE;
 	w = TEXTURE_WIDTH;
 	h = TEXTURE_HEIGHT;
-	pos = { 200.0f, 20.0f, 0.0f };
+	pos = { 10.0f, 10.0f, 0.0f };
 	texNo = 0;
 
 	hpbar = 0;
@@ -124,10 +125,12 @@ void UpdateHpbar(void)
 //=============================================================================
 // 描画処理
 //=============================================================================
+
+
 void DrawHpbar(void)
 {
 	PLAYER * player = GetPlayer();
-
+	
 	// 頂点バッファ設定
 	UINT stride = sizeof(VERTEX_3D);
 	UINT offset = 0;
@@ -160,9 +163,9 @@ void DrawHpbar(void)
 	float ty = 0.0f;		// テクスチャの左上Y座標
 
 	// １枚のポリゴンの頂点とテクスチャ座標を設定
-	SetSpriteColor(vertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
-
+	/*SetSpriteColor(vertexBuffer, px, py, pw, ph, tx, ty, tw, th,
+		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));*/
+	SetSpriteLeftTop(vertexBuffer, px, py, pw, ph, tx, ty, tw, th);
 	// ポリゴン描画
 	GetDeviceContext()->Draw(4, 0);
 
@@ -185,13 +188,25 @@ void DrawHpbar(void)
 
 	// テクスチャ設定
 	GetDeviceContext()->PSSetShaderResources(0, 1, &texture[0]);
-	px = 12.0f + player[0].hp * 1.87f;	// HPの表示位置X
-	pw = player[0].hp * 4.0f;			// HPの表示幅
+	//px = 12.0f + player[0].hp * 1.87f;	// HPの表示位置X
+	
+	//pw = player[0].hp * 4.0f;			// HPの表示幅
+
 
 	// １枚のポリゴンの頂点とテクスチャ座標を設定
-	SetSpriteColor(vertexBuffer, px, py, pw, ph, tx, ty, tw, th,
-		XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));
+	// SetSpriteColor(vertexBuffer, px, py, 50, ph, tx, ty, tw, th,
+	//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));	
+	static float tempHP = 400;
 
+	if (tempHP > 0.0f)
+	{
+		tempHP -= 1.5f;
+	}
+	else
+	{
+		tempHP = 0.0f;
+	}
+	SetSpriteLeftTop(vertexBuffer, px, py, tempHP , ph, 1.0, 1.0, tw, th);
 	// ポリゴン描画
 	GetDeviceContext()->Draw(4, 0);
 }
