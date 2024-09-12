@@ -19,7 +19,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(200/2)	// キャラサイズ
 #define TEXTURE_HEIGHT				(200/2)	// 
-#define TEXTURE_MAX					(3)		// テクスチャの数
+#define TEXTURE_MAX					(1)		// テクスチャの数
 
 #define TEXTURE_PATTERN_DIVIDE_X	(1)		// アニメパターンのテクスチャ内分割数（X)
 #define TEXTURE_PATTERN_DIVIDE_Y	(1)		// アニメパターンのテクスチャ内分割数（Y)
@@ -39,8 +39,8 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報 
 
 static char *g_TexturName[TEXTURE_MAX] = {
-	"data/TEXTURE/enemy00.png",
-	"data/TEXTURE/bar_white.png",
+	"data/TEXTURE/character_monster_shinigami_02.png",
+	//"data/TEXTURE/bar_white.png",
 };
 
 
@@ -322,7 +322,7 @@ void UpdateEnemy(void)
 
 
 	// エネミー全滅チェック
-	if (g_KillCnt >= 1)
+	if (g_KillCnt >= 10)
 	{
 		SetFade(FADE_OUT, MODE_CLEAR);
 	}
@@ -394,50 +394,50 @@ void DrawEnemy(void)
 
 
 	// ゲージのテスト
-	{
-		// 下敷きのゲージ（枠的な物）
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+	//{
+	//	// 下敷きのゲージ（枠的な物）
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
 
-		//ゲージの位置やテクスチャー座標を反映
-		float px = 600.0f;		// ゲージの表示位置X
-		float py =  10.0f;		// ゲージの表示位置Y
-		float pw = 300.0f;		// ゲージの表示幅
-		float ph =  30.0f;		// ゲージの表示高さ
+	//	//ゲージの位置やテクスチャー座標を反映
+	//	float px = 600.0f;		// ゲージの表示位置X
+	//	float py =  10.0f;		// ゲージの表示位置Y
+	//	float pw = 300.0f;		// ゲージの表示幅
+	//	float ph =  30.0f;		// ゲージの表示高さ
 
-		float tw = 1.0f;	// テクスチャの幅
-		float th = 1.0f;	// テクスチャの高さ
-		float tx = 0.0f;	// テクスチャの左上X座標
-		float ty = 0.0f;	// テクスチャの左上Y座標
+	//	float tw = 1.0f;	// テクスチャの幅
+	//	float th = 1.0f;	// テクスチャの高さ
+	//	float tx = 0.0f;	// テクスチャの左上X座標
+	//	float ty = 0.0f;	// テクスチャの左上Y座標
 
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteLTColor(g_VertexBuffer,
-			px, py, pw, ph,
-			tx, ty, tw, th,
-			XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	SetSpriteLTColor(g_VertexBuffer,
+	//		px, py, pw, ph,
+	//		tx, ty, tw, th,
+	//		XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
-
-
-		// エネミーの数に従ってゲージの長さを表示してみる
-		// テクスチャ設定
-		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
-
-		//ゲージの位置やテクスチャー座標を反映
-		pw = pw * ((float)g_EnemyCnt / ENEMY_MAX);
-
-		// １枚のポリゴンの頂点とテクスチャ座標を設定
-		SetSpriteLTColor(g_VertexBuffer,
-			px, py, pw, ph,
-			tx, ty, tw, th,
-			XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-
-		// ポリゴン描画
-		GetDeviceContext()->Draw(4, 0);
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
 
 
-	}
+	//	// エネミーの数に従ってゲージの長さを表示してみる
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+
+	//	//ゲージの位置やテクスチャー座標を反映
+	//	pw = pw * ((float)g_EnemyCnt / ENEMY_MAX);
+
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	SetSpriteLTColor(g_VertexBuffer,
+	//		px, py, pw, ph,
+	//		tx, ty, tw, th,
+	//		XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
+
+
+	//}
 
 
 

@@ -152,16 +152,16 @@ void UpdateTutorial(void)
 
 	if (GetKeyboardTrigger(DIK_RETURN))
 	{// Enter押したら、ステージを切り替える
-		SetFade(FADE_OUT, MODE_GAME);
+		SetFade(FADE_OUT, MODE_TITLE);
 	}
 	// ゲームパッドで入力処理
 	else if (IsButtonTriggered(0, BUTTON_START))
 	{
-		SetFade(FADE_OUT, MODE_GAME);
+		SetFade(FADE_OUT, MODE_TITLE);
 	}
 	else if (IsButtonTriggered(0, BUTTON_B))
 	{
-		SetFade(FADE_OUT, MODE_GAME);
+		SetFade(FADE_OUT, MODE_TITLE);
 	}
 	else if (GetKeyboardTrigger(DIK_DOWN))
 	{
@@ -209,7 +209,7 @@ void UpdateTutorial(void)
 	if (GetKeyboardTrigger(DIK_L))
 	{
 		SetLoadGame(TRUE);
-		SetFade(FADE_OUT, MODE_GAME);
+		SetFade(FADE_OUT, MODE_TITLE);
 	}
 
 

@@ -149,21 +149,8 @@ void UninitTitle(void)
 //=============================================================================
 void UpdateTitle(void)
 {
-
-	if (GetKeyboardTrigger(DIK_RETURN))
-	{// Enter押したら、ステージを切り替える
-		SetFade(FADE_OUT, MODE_TUTORIAL);
-	}
-	// ゲームパッドで入力処理
-	else if (IsButtonTriggered(0, BUTTON_START))
-	{
-		SetFade(FADE_OUT, MODE_TUTORIAL);
-	}
-	else if (IsButtonTriggered(0, BUTTON_B))
-	{
-		SetFade(FADE_OUT, MODE_TUTORIAL);
-	}
-	else if (GetKeyboardTrigger(DIK_DOWN))
+	
+	if (GetKeyboardTrigger(DIK_DOWN))
 	{
 		if (g_CursorY == NEW_GAME_Y)
 		{
@@ -204,6 +191,22 @@ void UpdateTitle(void)
 			g_CursorX = TUTORIAL_X;
 		}
 	}
+
+	if (g_CursorX == NEW_GAME_X)
+	{
+		if (GetKeyboardTrigger(DIK_RETURN))
+		{
+			SetFade(FADE_OUT, MODE_GAME);
+		}
+	}
+	else if (g_CursorX == TUTORIAL_X)
+	{
+		if (GetKeyboardTrigger(DIK_RETURN))
+		{
+			SetFade(FADE_OUT, MODE_TUTORIAL);
+		}
+	}
+	
 
 	// セーブデータをロードする？
 	if (GetKeyboardTrigger(DIK_L))
