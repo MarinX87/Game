@@ -322,7 +322,7 @@ void UpdateEnemy(void)
 
 
 	// エネミー全滅チェック
-	if (g_KillCnt >= 10)
+	if (g_KillCnt >= 30)
 	{
 		SetFade(FADE_OUT, MODE_CLEAR);
 	}
