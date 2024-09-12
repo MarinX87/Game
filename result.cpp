@@ -14,7 +14,7 @@
 //*****************************************************************************
 #define TEXTURE_WIDTH				(SCREEN_WIDTH)	// 背景サイズ
 #define TEXTURE_HEIGHT				(SCREEN_HEIGHT)	// 
-#define TEXTURE_MAX					(3)				// テクスチャの数
+#define TEXTURE_MAX					(4)				// テクスチャの数
 
 #define TEXTURE_WIDTH_LOGO			(480)			// ロゴサイズ
 #define TEXTURE_HEIGHT_LOGO			(80)			// 
@@ -34,6 +34,7 @@ static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/bg001.png",
 	"data/TEXTURE/result_logo.png",
 	"data/TEXTURE/number16x32.png",
+	"data/TEXTURE/gameclaer.png",
 };
 
 
@@ -227,6 +228,55 @@ void DrawResult(void)
 
 }
 
+void DrawClear(void)
+{
+	// 頂点バッファ設定
+	UINT stride = sizeof(VERTEX_3D);
+	UINT offset = 0;
+	GetDeviceContext()->IASetVertexBuffers(0, 1, &g_VertexBuffer, &stride, &offset);
+
+	// マトリクス設定
+	SetWorldViewProjection2D();
+
+	// プリミティブトポロジ設定
+	GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+	// マテリアル設定
+	MATERIAL material;
+	ZeroMemory(&material, sizeof(material));
+	material.Diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+	SetMaterial(material);
+
+	// リザルトの背景を描画
+	{
+		// テクスチャ設定
+		GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[3]);
+
+		// １枚のポリゴンの頂点とテクスチャ座標を設定
+		SetSpriteLeftTop(g_VertexBuffer, 0.0f, 0.0f, g_w, g_h, 0.0f, 0.0f, 1.0f, 1.0f);
+
+		// ポリゴン描画
+		GetDeviceContext()->Draw(4, 0);
+	}
+
+	//// リザルトのロゴを描画
+	//{
+	//	// テクスチャ設定
+	//	GetDeviceContext()->PSSetShaderResources(0, 1, &g_Texture[1]);
+
+	//	// １枚のポリゴンの頂点とテクスチャ座標を設定
+	//	SetSprite(g_VertexBuffer, g_Pos.x, g_Pos.y, TEXTURE_WIDTH_LOGO, TEXTURE_HEIGHT_LOGO, 0.0f, 0.0f, 1.0f, 1.0f);
+
+	//	// ポリゴン描画
+	//	GetDeviceContext()->Draw(4, 0);
+	//}
+
+
+
+
+
+
+}
 
 
 

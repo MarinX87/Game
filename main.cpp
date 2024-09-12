@@ -323,6 +323,10 @@ void Update(void)
 	case MODE_RESULT: // リザルト画面の更新
 		UpdateResult();
 		break;
+	case MODE_CLEAR: // リザルト画面の更新
+		UpdateResult();
+		break;
+
 	}
 
 	UpdateFade(); // フェードの更新処理
@@ -374,6 +378,9 @@ void Draw(void)
 
 	case MODE_RESULT: // リザルト画面の描画
 		DrawResult();
+		break;
+	case MODE_CLEAR:
+		DrawClear();
 		break;
 	}
 
@@ -486,7 +493,10 @@ void SetMode(int mode)
 		InitResult();
 		PlaySound(SOUND_LABEL_BGM_taitol);
 		break;
-
+	case MODE_CLEAR:
+		InitResult();
+	//	PlaySound(SOUND_LABEL_BGM_taitol);
+		break;
 	case MODE_MAX:
 		break;
 	}

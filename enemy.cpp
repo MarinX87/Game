@@ -203,6 +203,7 @@ void UpdateEnemy(void)
 
 		PLAYER* player = GetPlayer();
 
+		
 
 		if (g_Enemy[i].use == FALSE)
 		{
@@ -321,9 +322,9 @@ void UpdateEnemy(void)
 
 
 	// エネミー全滅チェック
-	if (g_KillCnt >= 5)
+	if (g_KillCnt >= 1)
 	{
-		SetFade(FADE_OUT, MODE_RESULT);
+		SetFade(FADE_OUT, MODE_CLEAR);
 	}
 
 #ifdef _DEBUG	// デバッグ情報を表示する
