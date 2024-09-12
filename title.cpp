@@ -23,14 +23,10 @@
 #define NEW_GAME_X	540
 #define NEW_GAME_Y	320
 
-#define LOAD_GAME_X	565
-#define LOAD_GAME_Y 365
+#define TUTORIAL_X 540
+#define TUTORIAL_Y 375
 
-#define TUTORIAL_X 590
-#define TUTORIAL_Y 410
 
-#define OPTION_X 650
-#define OPTION_Y 460
 
 //*****************************************************************************
 // プロトタイプ宣言
@@ -154,52 +150,27 @@ void UpdateTitle(void)
 	{
 		if (g_CursorY == NEW_GAME_Y)
 		{
-			g_CursorY = LOAD_GAME_Y;
-			g_CursorX = LOAD_GAME_X;
-		}
-		else if (g_CursorY == LOAD_GAME_Y)
-		{
 			g_CursorY = TUTORIAL_Y;
 			g_CursorX = TUTORIAL_X;
-		}
-		else if (g_CursorY == TUTORIAL_Y)
-		{
-			g_CursorY = OPTION_Y;
-			g_CursorX = OPTION_X;
 		}
 	}
 	else if (GetKeyboardTrigger(DIK_UP))
 	{
-		if(g_CursorY == NEW_GAME_X)
-		{
-			g_CursorY = OPTION_Y;
-			g_CursorX = OPTION_X;
-		}
-		else if (g_CursorY == LOAD_GAME_Y)
+		if (g_CursorY == TUTORIAL_Y)
 		{
 			g_CursorY = NEW_GAME_Y;
 			g_CursorX = NEW_GAME_X;
 		}
-		else if (g_CursorY == TUTORIAL_Y)
-		{
-			g_CursorY = LOAD_GAME_Y;
-			g_CursorX = LOAD_GAME_X;
-		}
-		else if (g_CursorY == OPTION_Y)
-		{
-			g_CursorY = TUTORIAL_Y;
-			g_CursorX = TUTORIAL_X;
-		}
 	}
 
-	if (g_CursorX == NEW_GAME_X)
+	if (g_CursorY == NEW_GAME_Y)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN))
 		{
 			SetFade(FADE_OUT, MODE_GAME);
 		}
 	}
-	else if (g_CursorX == TUTORIAL_X)
+	else if (g_CursorY == TUTORIAL_Y)
 	{
 		if (GetKeyboardTrigger(DIK_RETURN))
 		{
