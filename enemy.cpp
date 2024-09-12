@@ -9,6 +9,10 @@
 #include "player.h"
 #include "fade.h"
 #include "collision.h"
+#include "bullet.h"
+#include "score.h"
+#include "effect.h"
+
 
 //*****************************************************************************
 // マクロ定義
@@ -32,7 +36,7 @@
 // グローバル変数
 //*****************************************************************************
 static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
-static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
+static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報 
 
 static char *g_TexturName[TEXTURE_MAX] = {
 	"data/TEXTURE/enemy00.png",
@@ -44,6 +48,8 @@ static BOOL		g_Load = FALSE;			// 初期化を行ったかのフラグ
 static ENEMY	g_Enemy[ENEMY_MAX];		// エネミー構造体
 
 static int		g_EnemyCnt = ENEMY_MAX;
+
+static int		g_KillCnt = 0;
 
 static INTERPOLATION_DATA g_MoveTbl0[] = {
 	//座標								回転率						拡大率					   時間
@@ -108,6 +114,7 @@ HRESULT InitEnemy(void)
 
 	// エネミー構造体の初期化
 	g_EnemyCnt = 0;
+	g_KillCnt = 0;
 	for (int i = 0; i < ENEMY_MAX; i++)
 	{
 		if (i <= 20)
@@ -280,6 +287,33 @@ void UpdateEnemy(void)
 				}
 			}
 
+			// 当たり判定処理
+			{
+				BULLET* bullet = GetBullet();
+
+				// バレットの数分当たり判定を行う
+				for (int j = 0; j < BULLET_MAX; j++)
+				{
+					// 生きてるバレットと当たり判定をする
+					if (bullet[j].use == TRUE)
+					{
+						BOOL ans = CollisionBB(bullet[j].pos, bullet[j].w, bullet[j].h,
+							g_Enemy[i].pos, g_Enemy[i].w, g_Enemy[i].h);
+						// 当たっている？
+						if (ans == TRUE)
+						{
+							// 当たった時の処理
+							g_Enemy[i].use = FALSE;
+							AddScore(100);
+
+							// エフェクト発生
+							SetEffect(g_Enemy[i].pos.x, g_Enemy[i].pos.y, 30);
+
+							g_KillCnt++;
+						}
+					}
+				}
+			}
 
 			g_EnemyCnt++;		// 生きてた敵の数
 		}
@@ -287,7 +321,7 @@ void UpdateEnemy(void)
 
 
 	// エネミー全滅チェック
-	if (g_EnemyCnt <= 0)
+	if (g_KillCnt >= 5)
 	{
 		SetFade(FADE_OUT, MODE_RESULT);
 	}

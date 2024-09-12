@@ -175,33 +175,6 @@ void UpdateBullet(void)
 				break;
 			}
 
-			// 当たり判定処理
-			{
-				ENEMY* enemy = GetEnemy();
-
-				// エネミーの数分当たり判定を行う
-				for (int j = 0; j < ENEMY_MAX; j++)
-				{
-					// 生きてるエネミーと当たり判定をする
-					if (enemy[j].use == TRUE)
-					{
-						BOOL ans = CollisionBB(g_Bullet[i].pos, g_Bullet[i].w, g_Bullet[i].h,
-							enemy[j].pos, enemy[j].w, enemy[j].h);
-						// 当たっている？
-						if (ans == TRUE)
-						{
-							// 当たった時の処理
-							enemy[j].use = FALSE;
-							AddScore(100);
-
-							// エフェクト発生
-							SetEffect(enemy[j].pos.x, enemy[j].pos.y, 30);
-						}
-					}
-				}
-			}
-
-
 			bulletCount++;
 		}
 	}
