@@ -266,10 +266,10 @@ void UpdatePlayer(void)
 					g_Player[i].moving = TRUE;
 				}
 
-				if (GetKeyboardTrigger(DIK_RETURN))
-				{// Enter押したら、ステージを切り替える
-					SetFade(FADE_OUT, MODE_RESULT);
-				}
+				//if (GetKeyboardTrigger(DIK_RETURN))
+				//{// Enter押したら、ステージを切り替える
+				//	SetFade(FADE_OUT, MODE_RESULT);
+				//}
 
 				// 力業ジャンプ処理
 				//if (g_jumpCnt > 0)
