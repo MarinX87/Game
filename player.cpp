@@ -365,6 +365,9 @@ void UpdatePlayer(void)
 							if (ans == TRUE)
 							{
 								// “–‚½‚Á‚½‚Ìˆ—
+
+								g_Player[i].hp -= 50;
+
 								enemy[j].use = FALSE;
 								AddScore(10);
 							}
@@ -449,6 +452,13 @@ void UpdatePlayer(void)
 			}
 
 		}
+
+
+		if (g_Player[i].hp <= 0)
+		{
+			SetFade(FADE_OUT, MODE_RESULT);
+		}
+
 	}
 
 

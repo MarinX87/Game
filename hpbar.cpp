@@ -42,6 +42,8 @@ static int						texNo;					// テクスチャ番号
 
 static int						hpbar;			    	// ヒットポイント
 
+static float tempHP = 400;
+
 //=============================================================================
 // 初期化処理
 //=============================================================================
@@ -196,16 +198,9 @@ void DrawHpbar(void)
 	// １枚のポリゴンの頂点とテクスチャ座標を設定
 	// SetSpriteColor(vertexBuffer, px, py, 50, ph, tx, ty, tw, th,
 	//	XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f));	
-	static float tempHP = 400;
 
-	if (tempHP > 0.0f)
-	{
-		tempHP -= 1.5f;
-	}
-	else
-	{
-		tempHP = 0.0f;
-	}
+	tempHP = player[0].hp;
+
 	SetSpriteLeftTop(vertexBuffer, px, py, tempHP , ph, 1.0, 1.0, tw, th);
 	// ポリゴン描画
 	GetDeviceContext()->Draw(4, 0);

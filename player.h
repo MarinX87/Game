@@ -18,7 +18,7 @@
 
 #define	PLAYER_OFFSET_CNT	(16)	// 16ï™êg
 
-#define PLAYER_HP (100); 
+#define PLAYER_HP (400); 
 
 enum
 {
