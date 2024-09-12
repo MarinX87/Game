@@ -15,8 +15,8 @@
 //*****************************************************************************
 // マクロ定義
 //*****************************************************************************
-#define TEXTURE_WIDTH				(100/2)	// キャラサイズ
-#define TEXTURE_HEIGHT				(100/2)	// 
+#define TEXTURE_WIDTH				(230/2)	// キャラサイズ
+#define TEXTURE_HEIGHT				(230/2)	// 
 #define TEXTURE_MAX					(4)		// テクスチャの数
 
 #define TEXTURE_PATTERN_DIVIDE_X	(1)		// アニメパターンのテクスチャ内分割数（X)
@@ -38,10 +38,10 @@ static ID3D11Buffer				*g_VertexBuffer = NULL;				// 頂点情報
 static ID3D11ShaderResourceView	*g_Texture[TEXTURE_MAX] = { NULL };	// テクスチャ情報
 
 static char *g_TexturName[] = {
-	"data/TEXTURE/bullet00.png",
-	"data/TEXTURE/yubi.jpg",
-	"data/TEXTURE/tree000.png",
-	"data/TEXTURE/shadow000.jpg",
+	"data/TEXTURE/bullet1.png",
+	"data/TEXTURE/bullet2.png",
+	"data/TEXTURE/bullet3.png",
+	"data/TEXTURE/bullet4.png",
 };
 
 static BOOL		g_Load = FALSE;			// 初期化を行ったかのフラグ
